@@ -9,7 +9,7 @@
 // @icon        https://ksrt12.github.io/favicon.ico
 // @updateURL   https://ksrt12.github.io/isu/abit.user.js
 // @downloadURL https://ksrt12.github.io/isu/abit.user.js
-// @include     https://isu.ifmo.ru/pls/apex/f?p=2175*
+// @include     https://isu.ifmo.ru/pls/apex/f?p=2175:*
 // @run-at      document-end
 // @grant       none
 // ==/UserScript==

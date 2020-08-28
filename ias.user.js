@@ -15,20 +15,18 @@
 // ==/UserScript==
 
 var sum = 0,
-	c = 0,
-	count = "count",
-	mark = "mark";
+	c = 0;
 
 function make_sum(table_num, col_name, col_point) {
 	var json = {};
-	var curr_table = document.querySelectorAll("#scrolltable-" + table_num + " > tbody > tr");
+	const curr_table = document.querySelectorAll("#scrolltable-" + table_num + " > tbody > tr");
 	for (var i of curr_table) {
-		var a = i.querySelector("td:nth-child(" + col_point + ")");
+		let a = i.querySelector("td:nth-child(" + col_point + ")");
 		if (a) {
-			var b = Number(a.innerText);
+			let b = Number(a.innerText);
 			if (!isNaN(b)) {
-				const subj = i.querySelector("td:nth-child(" + col_name + ")").innerText;
-				const curr_subj = json[subj];
+				let subj = i.querySelector("td:nth-child(" + col_name + ")").innerText;
+				let curr_subj = json[subj];
 				if (curr_subj) {
 					curr_subj.mark += b;
 					curr_subj.count += 1;
@@ -41,8 +39,8 @@ function make_sum(table_num, col_name, col_point) {
 		}
 	}
 
-	for (const subj of Object.keys(json)) {
-		const curr_subj = json[subj];
+	for (let subj of Object.keys(json)) {
+		let curr_subj = json[subj];
 		if (curr_subj.count > 1) {
 			json[subj].mark = Number((curr_subj.mark / curr_subj.count).toFixed(0));
 			json[subj].count = 1;
@@ -57,7 +55,7 @@ window.addEventListener("load", function() {
 	make_sum(1, 1, 8);
 	make_sum(2, 2, 5);
 	make_sum(3, 2, 7);
-	var m = sum / c;
+	let m = sum / c;
 
 	var P = document.createElement('h4');
 	P.prepend(document.createTextNode('Средний балл: ' + m.toFixed(5)));
