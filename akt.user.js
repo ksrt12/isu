@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        ПсевдоАКТы
-// @version     1.1
+// @version     1.2
 // @date        2020-08-30
 // @author      kazakovstepan
 // @namespace   ITMO University
@@ -70,12 +70,17 @@ function make_akt_table() {
 		'ФИО',
 		'Факультет'
 	], true));
-	let json = getTELO();
-	for (let pip of Object.keys(json)) {
-		tbody.appendChild(table_row([
-			pip,
-			json[pip]
-		], false));
+	for (let stream of document.querySelectorAll("body > div.main.page > section.static-page-rule > div > h3")) {
+		let str = stream.innerText;
+		for (let i of stream.nextElementSibling.querySelectorAll("tbody > tr")) {
+			let text = i.cells[1].innerText;
+			if ((text === 'ВИ') || (text === "ЕГЭ")) {
+				tbody.appendChild(table_row([
+					i.cells[0].innerText,
+					getFAC(str.substr(0, 8), str)
+				], false));
+			}
+		}
 	}
 	return akt_table;
 }
@@ -154,21 +159,4 @@ function getFAC(str, full) {
 			break;
 	}
 	return fac;
-}
-
-function getTELO() {
-	var table = {};
-	for (let stream of document.querySelectorAll("body > div.main.page > section.static-page-rule > div > h3")) {
-		let str = stream.innerText;
-		let fac = getFAC(str.substr(0, 8), str);
-		for (let i of stream.nextElementSibling.querySelectorAll("tbody > tr")) {
-			let text = i.cells[1].innerText;
-			if ((text === 'ВИ') || (text === "ЕГЭ")) {
-				table[i.cells[0].innerText] = fac;
-			}
-		}
-	}
-
-
-	return table;
 }
