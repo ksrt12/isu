@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name        ПсевдоАКТы
-// @version     1.0
-// @date        2020-08-29
+// @version     1.1
+// @date        2020-08-30
 // @author      kazakovstepan
 // @namespace   ITMO University
-// @description Генерирует акт json
+// @description Генерирует неотсорированный акт
 // @homepage    https://vk.com/kazakovstepan
 // @icon        https://isu.ifmo.ru/i/libraries/frontend/misc/favicon.ico
 // @updateURL   https://ksrt12.github.io/isu/akt.user.js
@@ -102,7 +102,7 @@ function getFAC(str, full) {
 		case "09.03.01":
 		case "09.03.04":
 		case "44.03.04":
-			fac = "ПИиКТ";
+			fac = "ФПИиКТ";
 			break;
 		case "09.03.03":
 		case "11.03.02":
