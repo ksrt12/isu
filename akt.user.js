@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        ПсевдоАКТы
-// @version     1.2
+// @version     2.0
 // @date        2020-08-30
 // @author      kazakovstepan
 // @namespace   ITMO University
@@ -16,21 +16,27 @@
 
 window.onload = function() {
 	let prikaz = document.querySelector("body > div.main.page > section.static-page-rule > div > h1");
-	let a = document.createElement("a");
-	a.onclick = function() {
-		Spoiler();
-	};
-	a.className = "link_spoiler";
-	a.id = "linkSpoiler";
-	a.style.cursor = "pointer";
-	a.appendChild(document.createTextNode("Акт"));
-	let b = document.createElement("div");
-	b.id = "contentSpoiler";
-	b.style = "display: none;";
-	b.appendChild(make_akt_table());
-	prikaz.after(b);
-	prikaz.after(a);
+	var dbut = make_dlink(prikaz.innerText.substr(9), "Акт");
+	prikaz.after(dbut);
 };
+
+function make_dlink(name, str) {
+	var a = document.createElement("a");
+	a.style.cursor = "pointer";
+	a.text = str;
+	a.download = (name + '.xls').replace(/ /g, '_');;
+	a.href = akt_xls(make_akt_table(), name);
+	return a;
+}
+
+function akt_xls(table, name) {
+	const uri = 'data:application/vnd.ms-excel;base64,',
+		template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>';
+	function base64(s) { return window.btoa(unescape(encodeURIComponent(s))) }
+	function format(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; })}
+	let ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+	return uri + base64(format(template, ctx));
+}
 
 function add_entry(x, tgt) {
 	if (typeof(x) == 'string') {
@@ -50,9 +56,6 @@ function table_row(l, p) {
 	let tr = document.createElement('tr');
 	for (let i in l) {
 		let g = document.createElement('td');
-		if (p) {
-			g.className = "hdr";
-		}
 		add_entry(l[i], g);
 		tr.appendChild(g);
 	}
@@ -66,10 +69,6 @@ function make_akt_table() {
 	akt_table.setAttribute('border', 'all');
 	let tbody = document.createElement('tbody');
 	akt_table.appendChild(tbody);
-	tbody.appendChild(table_row([
-		'ФИО',
-		'Факультет'
-	], true));
 	for (let stream of document.querySelectorAll("body > div.main.page > section.static-page-rule > div > h3")) {
 		let str = stream.innerText;
 		for (let i of stream.nextElementSibling.querySelectorAll("tbody > tr")) {
@@ -83,18 +82,6 @@ function make_akt_table() {
 		}
 	}
 	return akt_table;
-}
-
-function Spoiler() {
-	var ele = document.getElementById("contentSpoiler");
-	var text = document.getElementById("linkSpoiler");
-	if (ele.style.display == "block") {
-		ele.style.display = "none";
-		text.innerHTML = "Акт";
-	} else {
-		ele.style.display = "block";
-		text.innerHTML = "Скрыть";
-	}
 }
 
 function getFAC(str, full) {
