@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        ПсевдоАКТы
-// @version     2.0
+// @version     2.5
 // @date        2020-08-30
 // @author      kazakovstepan
 // @namespace   ITMO University
@@ -16,16 +16,26 @@
 
 window.onload = function() {
 	let prikaz = document.querySelector("body > div.main.page > section.static-page-rule > div > h1");
-	var dbut = make_dlink(prikaz.innerText.substr(9), "Акт");
-	prikaz.after(dbut);
+	prikaz.after(make_export(prikaz));
 };
 
-function make_dlink(name, str) {
+function make_export(prikaz) {
+	let result = make_akt_table();
+	let xls = make_dlink(prikaz.innerText.substr(9), result, "xls");
+	let json = make_dlink(prikaz.innerText.substr(9), result, "json");
+	let div = document.createElement("div");
+	div.style.display = "flex";
+	div.appendChild(xls);
+	div.appendChild(json);
+	return div;
+}
+
+function make_dlink(name, source, forma) {
 	var a = document.createElement("a");
-	a.style.cursor = "pointer";
-	a.text = str;
-	a.download = (name + '.xls').replace(/ /g, '_');;
-	a.href = akt_xls(make_akt_table(), name);
+	a.insertAdjacentHTML('beforeend', "Акт." + forma);
+	a.style = "margin-right: 5px; cursor: pointer;";
+	a.download = (name + '.' + forma).replace(/ /g, '_');
+	a.href = (forma === "xls" ) ? akt_xls(source[0], name) : akt_json(source[1]);
 	return a;
 }
 
@@ -36,6 +46,10 @@ function akt_xls(table, name) {
 	function format(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; })}
 	let ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
 	return uri + base64(format(template, ctx));
+}
+
+function akt_json(json_data) {
+    return URL.createObjectURL(new Blob([JSON.stringify(json_data)], {type: 'text/plain'}));
 }
 
 function add_entry(x, tgt) {
@@ -63,6 +77,7 @@ function table_row(l, p) {
 }
 
 function make_akt_table() {
+	let akt_json = {};
 	let akt_table = document.createElement('table');
 	akt_table.id = 'akt_table';
 	akt_table.setAttribute('rules', 'all');
@@ -74,6 +89,7 @@ function make_akt_table() {
 		for (let i of stream.nextElementSibling.querySelectorAll("tbody > tr")) {
 			let text = i.cells[1].innerText;
 			if ((text === 'ВИ') || (text === "ЕГЭ")) {
+				akt_json[i.cells[0].innerText] = true;
 				tbody.appendChild(table_row([
 					i.cells[0].innerText,
 					getFAC(str.substr(0, 8), str)
@@ -81,7 +97,7 @@ function make_akt_table() {
 			}
 		}
 	}
-	return akt_table;
+	return [akt_table, akt_json];
 }
 
 function getFAC(str, full) {
