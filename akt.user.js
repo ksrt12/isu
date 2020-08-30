@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        ПсевдоАКТы
-// @version     2.5
+// @version     3.0
 // @date        2020-08-30
 // @author      kazakovstepan
 // @namespace   ITMO University
@@ -10,14 +10,104 @@
 // @updateURL   https://ksrt12.github.io/isu/akt.user.js
 // @downloadURL https://ksrt12.github.io/isu/akt.user.js
 // @match       https://abit.itmo.ru/order/*
+// @match       https://isu.ifmo.ru/pls/apex/f?p=2175:9:*
 // @run-at      document-end
 // @grant       none
 // ==/UserScript==
 
-window.onload = function() {
-	let prikaz = document.querySelector("body > div.main.page > section.static-page-rule > div > h1");
-	prikaz.after(make_export(prikaz));
-};
+
+const HREF = document.location.href;
+
+
+if (HREF.includes("abit")) {
+	window.onload = function() {
+		let prikaz = document.querySelector("body > div.main.page > section.static-page-rule > div > h1");
+		prikaz.after(make_export(prikaz));
+	};
+} else if (HREF.includes("isu")) {
+	make_export_isu();
+}
+
+function make_export_isu() {
+	var result, json_data, delo_table, c = 0;
+	let isu_rep_num = document.querySelector("#report_list_paginate > ul");
+	let win = document.querySelector("#list > div > div.grid-container > div > div > div");
+	let source = document.createElement("textarea"); source.type = "text";
+	//let source = document.createElement("input"); source.type = "file";
+	let load = document.createElement("a"); load.style = "margin-right: 5px; cursor: pointer;";	load.text = "LOAD";
+	let run = document.createElement("a"); run.style = "margin-right: 5px; cursor: pointer;"; run.text = "RUN";
+	load.onclick = function() {
+		result = run_search(source);
+		json_data = result[1];
+		delo_table = result[0];
+		if (json_data) {
+			source.style.display = "none";
+			load.style.display = "none";
+			source.after(run);
+		}
+	};
+	run.onclick = function() {
+		delo_table = add_list(delo_table, json_data);
+		c++;
+		create_report(delo_table, c, run);
+	};
+	win.after(source);
+	source.after(load);
+}
+
+function create_report(table, count, elem) {
+	let old_akt = document.getElementById("akt_xls");
+	if (old_akt) {old_akt.remove()}
+	if (count > 0) {
+		G2.notify("Данные добавлены: " + count);
+		let report = make_dlink("акт" + count, [table, null], "xls")
+		elem.after(report);
+	}
+}
+
+function run_search(val) {
+	let to_json = (val.type === "file") ? readFile(val) : val.value;
+	let json_data, delo_table = make_base_table('delo_table');
+	try {
+		json_data = JSON.parse(to_json);
+		G2.notify("JSON загружен!");
+	} catch(err) {
+		G2.notify("Некорректный JSON!", 'Ошибка', true);
+		json_data = false;
+	}
+	return [delo_table, json_data];
+}
+
+function add_list(delo_table, json_data) {
+	let isu_tbt = document.querySelectorAll("#report_list > tbody > tr");
+	let tbody = delo_table.querySelector("tbody");
+	for (let i of isu_tbt) {
+		let fio = i.querySelector("td:nth-child(2)");
+		if (json_data[fio.innerText]) {
+			tbody.appendChild(table_row([
+				json_data[fio.innerText],
+				i.querySelector("td:nth-child(1)").innerText,
+				get_id(fio)
+			], false));
+		}
+	}
+	return delo_table;
+}
+
+function get_id(elem) {
+	let a = document.createElement("a");
+	let pid = elem.querySelector("span:nth-child(2)").getAttribute("pid");
+	a.href = 'https://isu.ifmo.ru/pls/apex/f?p=2175:ST_FORM:114054305566429::::ST_ID:' + pid;
+	a.appendChild(document.createTextNode(elem.innerText));
+	return a;
+}
+
+function readFile(input) {
+	let file = input.files[0];
+	let reader = new FileReader();
+	reader.readAsText(file);
+	return reader.onload = () => (reader.result);
+}
 
 function make_export(prikaz) {
 	let result = make_akt_table();
@@ -32,6 +122,7 @@ function make_export(prikaz) {
 
 function make_dlink(name, source, forma) {
 	var a = document.createElement("a");
+	a.id = "akt_" + forma;
 	a.insertAdjacentHTML('beforeend', "Акт." + forma);
 	a.style = "margin-right: 5px; cursor: pointer;";
 	a.download = (name + '.' + forma).replace(/ /g, '_');
@@ -49,7 +140,7 @@ function akt_xls(table, name) {
 }
 
 function akt_json(json_data) {
-    return URL.createObjectURL(new Blob([JSON.stringify(json_data)], {type: 'text/plain'}));
+	return URL.createObjectURL(new Blob([JSON.stringify(json_data)], {type: 'text/plain'}));
 }
 
 function add_entry(x, tgt) {
@@ -78,18 +169,14 @@ function table_row(l, p) {
 
 function make_akt_table() {
 	let akt_json = {};
-	let akt_table = document.createElement('table');
-	akt_table.id = 'akt_table';
-	akt_table.setAttribute('rules', 'all');
-	akt_table.setAttribute('border', 'all');
-	let tbody = document.createElement('tbody');
-	akt_table.appendChild(tbody);
+	let akt_table = make_base_table('akt_table');
+	let tbody = akt_table.querySelector("tbody");
 	for (let stream of document.querySelectorAll("body > div.main.page > section.static-page-rule > div > h3")) {
 		let str = stream.innerText;
 		for (let i of stream.nextElementSibling.querySelectorAll("tbody > tr")) {
 			let text = i.cells[1].innerText;
 			if ((text === 'ВИ') || (text === "ЕГЭ")) {
-				akt_json[i.cells[0].innerText] = true;
+				akt_json[i.cells[0].innerText] = getFAC(str.substr(0, 8), str);
 				tbody.appendChild(table_row([
 					i.cells[0].innerText,
 					getFAC(str.substr(0, 8), str)
@@ -98,6 +185,15 @@ function make_akt_table() {
 		}
 	}
 	return [akt_table, akt_json];
+}
+
+function make_base_table(table_id) {
+	let base_table = document.createElement('table');
+	base_table.id = table_id;
+	base_table.setAttribute('rules', 'all');
+	base_table.setAttribute('border', 'all');
+	base_table.createTBody();
+	return base_table;
 }
 
 function getFAC(str, full) {
