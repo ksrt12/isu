@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        ПсевдоАКТы
-// @version     3.1
+// @version     3.2
 // @date        2020-08-30
 // @author      kazakovstepan
 // @namespace   ITMO University
@@ -17,7 +17,7 @@
 
 
 const HREF = document.location.href;
-var json_raw;
+var json_raw, json_raw_name;
 
 if (HREF.includes("abit")) {
 	window.onload = function() {
@@ -69,7 +69,7 @@ function create_report(table, count, elem) {
 	if (old_akt) {old_akt.remove()}
 	if (count > 0) {
 		G2.notify("Данные добавлены: " + count);
-		let report = make_dlink("акт" + count, [table, null], "xls")
+		let report = make_dlink(json_raw_name + '-' + count, [table, null], "xls")
 		elem.after(report);
 	}
 }
@@ -117,6 +117,7 @@ function readFile(input) {
 	reader.readAsText(file);
 	reader.onload = function() {
 		json_raw = reader.result;
+		json_raw_name = file.name.replace(/.json/i, '')
 	}
 }
 
