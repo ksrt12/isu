@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        ПсевдоАКТы
-// @version     3.0
+// @version     3.1
 // @date        2020-08-30
 // @author      kazakovstepan
 // @namespace   ITMO University
@@ -17,7 +17,7 @@
 
 
 const HREF = document.location.href;
-
+var json_raw;
 
 if (HREF.includes("abit")) {
 	window.onload = function() {
@@ -32,10 +32,19 @@ function make_export_isu() {
 	var result, json_data, delo_table, c = 0;
 	let isu_rep_num = document.querySelector("#report_list_paginate > ul");
 	let win = document.querySelector("#list > div > div.grid-container > div > div > div");
-	let source = document.createElement("textarea"); source.type = "text";
-	//let source = document.createElement("input"); source.type = "file";
+	//let source = document.createElement("textarea"); source.type = "text";
+	let source = document.createElement("input"); source.type = "file";
 	let load = document.createElement("a"); load.style = "margin-right: 5px; cursor: pointer;";	load.text = "LOAD";
 	let run = document.createElement("a"); run.style = "margin-right: 5px; cursor: pointer;"; run.text = "RUN";
+	if (source.type === "file") {
+		source.onchange = function() {
+			try {
+				readFile(source);
+			} catch(err) {
+				console.log(err);
+			}
+		}
+	}
 	load.onclick = function() {
 		result = run_search(source);
 		json_data = result[1];
@@ -65,8 +74,8 @@ function create_report(table, count, elem) {
 	}
 }
 
-function run_search(val) {
-	let to_json = (val.type === "file") ? readFile(val) : val.value;
+function run_search(input) {
+	let to_json = (input.type === "file") ? json_raw : input.value;
 	let json_data, delo_table = make_base_table('delo_table');
 	try {
 		json_data = JSON.parse(to_json);
@@ -106,7 +115,9 @@ function readFile(input) {
 	let file = input.files[0];
 	let reader = new FileReader();
 	reader.readAsText(file);
-	return reader.onload = () => (reader.result);
+	reader.onload = function() {
+		json_raw = reader.result;
+	}
 }
 
 function make_export(prikaz) {
@@ -176,11 +187,10 @@ function make_akt_table() {
 		for (let i of stream.nextElementSibling.querySelectorAll("tbody > tr")) {
 			let text = i.cells[1].innerText;
 			if ((text === 'ВИ') || (text === "ЕГЭ")) {
-				akt_json[i.cells[0].innerText] = getFAC(str.substr(0, 8), str);
-				tbody.appendChild(table_row([
-					i.cells[0].innerText,
-					getFAC(str.substr(0, 8), str)
-				], false));
+				let fac = getFAC(str.substr(0, 8), str);
+				let fio = i.cells[0].innerText;
+				akt_json[fio] = fac;
+				tbody.appendChild(table_row([fio, fac], false));
 			}
 		}
 	}
