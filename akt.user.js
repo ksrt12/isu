@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        ПсевдоАКТы
-// @version     3.2
+// @version     3.5
 // @date        2020-08-30
 // @author      kazakovstepan
 // @namespace   ITMO University
@@ -94,7 +94,8 @@ function add_list(delo_table, json_data) {
 		let fio = i.querySelector("td:nth-child(2)");
 		if (json_data[fio.innerText]) {
 			tbody.appendChild(table_row([
-				json_data[fio.innerText],
+				json_data[fio.innerText].usl,
+				json_data[fio.innerText].fac,
 				i.querySelector("td:nth-child(1)").innerText,
 				get_id(fio)
 			], false));
@@ -122,9 +123,11 @@ function readFile(input) {
 }
 
 function make_export(prikaz) {
-	let result = make_akt_table();
-	let xls = make_dlink(prikaz.innerText.substr(9), result, "xls");
-	let json = make_dlink(prikaz.innerText.substr(9), result, "json");
+	let name = prikaz.innerText.substr(9);
+	let bvi = document.querySelector("body > div.main.page > section.static-page-rule > div > table > tbody > tr.hdr > td:nth-child(3)").innerText.includes("Олимпиа");
+	let result = make_akt_table(name.substring(0, 4), bvi);
+	let xls = make_dlink(name, result, "xls");
+	let json = make_dlink(name, result, "json");
 	let div = document.createElement("div");
 	div.style.display = "flex";
 	div.appendChild(xls);
@@ -179,19 +182,22 @@ function table_row(l, p) {
 	return tr;
 }
 
-function make_akt_table() {
+function make_akt_table(prikaz_n, isBVI) {
 	let akt_json = {};
 	let akt_table = make_base_table('akt_table');
 	let tbody = akt_table.querySelector("tbody");
 	for (let stream of document.querySelectorAll("body > div.main.page > section.static-page-rule > div > h3")) {
 		let str = stream.innerText;
 		for (let i of stream.nextElementSibling.querySelectorAll("tbody > tr")) {
-			let text = i.cells[1].innerText;
-			if ((text === 'ВИ') || (text === "ЕГЭ")) {
+			if (i.className !== "hdr") {
+				let usl = isBVI ? "БВИ" : i.cells[1].innerText;
 				let fac = getFAC(str.substr(0, 8), str);
 				let fio = i.cells[0].innerText;
-				akt_json[fio] = fac;
-				tbody.appendChild(table_row([fio, fac], false));
+				let local_obj = {};
+				local_obj.fac = fac;
+				local_obj.usl = usl;
+				akt_json[fio] = local_obj;
+				tbody.appendChild(table_row([prikaz_n, usl, fio, fac], false));
 			}
 		}
 	}
@@ -254,11 +260,7 @@ function getFAC(str, full) {
 			fac = "ФЛФО";
 			break;
 		case "16.03.01":
-			if (full.includes("азерна")) {
-				fac = "ФЛФО";
-			} else {
-				fac = "ФТФ";
-			}
+				fac = "ФТФ|ФЛФО";
 			break;
 		case "19.03.01":
 			fac = "ФБТ";
