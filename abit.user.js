@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Абитуриент
-// @version     6.8
-// @date        2020-08-29
+// @version     6.8.1
+// @date        2020-09-02
 // @author      kazakovstepan
 // @namespace   ITMO University
 // @description IT's MOre than the Система Абитуриент
@@ -36,9 +36,9 @@ function getSelectedText(elem) {
 
 // make buttons
 function addCheckButton(str, ISUid, func) {
-	var ISUELEM = getID(ISUid);
+	let ISUELEM = getID(ISUid);
 	if ((ISUELEM !== null) && (getID("ButCheck") === null)) {
-	var CheckButton = document.createElement("button");
+	let CheckButton = document.createElement("button");
 		CheckButton.id = "ButCheck";
 		CheckButton.value = str;
 		CheckButton.className = "btn btn-labeled ";
@@ -52,11 +52,11 @@ function addCheckButton(str, ISUid, func) {
 
 // generate link for checking all olymps
 function addAllOlympsCheck() {
-	var LN = getID('ST_LASTNAME').value;
-	var FN = getID('ST_FIRSTNAME').value;
-	var MN = getID('ST_MIDDLENAME').value;
-	var BD = getID('ST_DOB').value.split('.');
-	var DN = getID('P2_DELO').value;
+	let LN = getID('ST_LASTNAME').value;
+	let FN = getID('ST_FIRSTNAME').value;
+	let MN = getID('ST_MIDDLENAME').value;
+	let BD = getID('ST_DOB').value.split('.');
+	let DN = getID('P2_DELO').value;
 	return 'https://ksrt12.github.io/?LN=' + LN + '&FN=' + FN + '&MN=' + MN + '&BDD=' + BD[0] + '&BDM=' + BD[1] + '&BDY=' + BD[2] + '&DN=' + DN;
 }
 
@@ -66,8 +66,8 @@ function getONUM() {
 
 // generate link for checking current olymp
 function addOlympCheck() {
-	var OLYMPNUM = getONUM();
-	var OLYMPYEAR = getID('OLYMP_YEAR').value;
+	let OLYMPNUM = getONUM();
+	let OLYMPYEAR = getID('OLYMP_YEAR').value;
 	return (OLYMPNUM.startsWith('0000')) ? ((OLYMPYEAR === '2020') || (OLYMPYEAR === '2019') || (OLYMPYEAR === '2018')) ? 'https://ksrt12.github.io/files/' + 
 		OLYMPYEAR + '.pdf' : 'https://www.google.ru/' : 'https://diploma.rsr-olymp.ru/files/rsosh-diplomas-static/compiled-storage-' +
 		OLYMPYEAR + '/by-code/' + OLYMPNUM + '/white.pdf';
@@ -75,8 +75,8 @@ function addOlympCheck() {
 
 // set checkboxes automatically if 'LK_DELO_0' is checked
 function autophotocopy(DZCH) {
-	var LK_PHOTO = getID('LK_PHOTO_0');
-	var LK_COPY = getID('LK_PODL_COPY_0');
+	let LK_PHOTO = getID('LK_PHOTO_0');
+	let LK_COPY = getID('LK_PODL_COPY_0');
 	DZCH.onclick = function() {
 		LK_PHOTO.checked = DZCH.checked;
 		LK_COPY.checked = DZCH.checked;
@@ -85,7 +85,7 @@ function autophotocopy(DZCH) {
 
 // set default EGE date for subject
 function sedate(subIndex) {
-	var EGEDATE = getID('EGE_DATE');
+	let EGEDATE = getID('EGE_DATE');
 	if (EGEDATE.selectedIndex === 0) {
 		switch (subIndex) {
 			case 4:
@@ -101,14 +101,13 @@ function sedate(subIndex) {
 
 // parsing page for 'ege_form'
 function autoEGE() {
-	var EGESUBJ = getID('EGE_SUBJ');
-	var EGEFORM = getID('ege_form');
+	let EGESUBJ = getID('EGE_SUBJ');
+	let EGEFORM = getID('ege_form');
 	if (EGEFORM !== null) {
 		EGEFORM.onclick = function() {
 			sedate(EGESUBJ.selectedIndex);
 		};
 	}
-	delete EGEFORM;
 }
 
 // add check button for current olymp
@@ -122,9 +121,9 @@ function listenOLYMP() {
 
 // check BVI without agree
 function checkBVIwoAGREE() {
-	var orig = getID('LK_PODL_0').checked;
-	var agree = getSelectedText(getID('LK_AGREE')).substr(0, 8);
-	for (var i of document.querySelectorAll("#report_rating_rep > tbody > tr")) {
+	let orig = getID('LK_PODL_0').checked;
+	let agree = getSelectedText(getID('LK_AGREE')).substr(0, 8);
+	for (let i of document.querySelectorAll("#report_rating_rep > tbody > tr")) {
 		if (i.querySelector('td:nth-child(5)').innerText === 'без вступительных испытаний') {
 			if (agree !== i.querySelector('td:nth-child(2)').innerText.substr(0, 8)) {
 				NotifyErr('БВИ без согласия!');
@@ -138,13 +137,13 @@ function checkBVIwoAGREE() {
 
 // get min points for current stream
 function getMinPoints(stream) {
-	var points, math, subj;
+	let points, math, subj;
 	if (stream === '01.03.02') {
 		math = 76;
 	} else {
 		math = 62;
 	}
-	var minpoints = {
+	let minpoints = {
 		'Математика': math,
 		'Русский язык': 60
 	};
@@ -177,8 +176,8 @@ function getMinPoints(stream) {
 
 // get subjects for VSOSH
 function getVSEROS(stream) {
-	var vsosh = {'Математика': true};
-	var subj;
+	let vsosh = {'Математика': true};
+	let subj;
 	switch (stream) {
 		case '01.03.02':
 		case '09.03.01':
@@ -222,7 +221,7 @@ function getVSEROS(stream) {
 			subj = ["Экономика", "Обществознание", "Право"];
 			break;
 	}
-	for (var i of subj) {
+	for (let i of subj) {
 		vsosh[i] = true;
 	}
 	return vsosh;
@@ -230,8 +229,8 @@ function getVSEROS(stream) {
 
 // get EGE points
 function loadEGEpoints() {
-	var EGE_points = {};
-	for (var i of document.querySelectorAll("#report_baki_ege_rep > tbody > tr")) {
+	let EGE_points = {};
+	for (let i of document.querySelectorAll("#report_baki_ege_rep > tbody > tr")) {
 		EGE_points[i.querySelector('td:nth-child(2)').innerText] = Number(i.querySelector('td:nth-child(4)').innerText);
 	}
 	return EGE_points;
@@ -239,11 +238,11 @@ function loadEGEpoints() {
 
 // get olymps
 function loadOLYMPS() {
-	var OLYMPSbyName = {};
-	for (var i of document.querySelectorAll("#report_olymp_rep > tbody > tr > td:nth-child(1)")) {
-		var a = i.innerText;
-		var olymp_subj = a.substring(a.indexOf(' (') + 2, a.indexOf(', '));
-		var olymp_name = a.substring(0, a.indexOf(' ('));
+	let OLYMPSbyName = {};
+	for (let i of document.querySelectorAll("#report_olymp_rep > tbody > tr > td:nth-child(1)")) {
+		let a = i.innerText;
+		let olymp_subj = a.substring(a.indexOf(' (') + 2, a.indexOf(', '));
+		let olymp_name = a.substring(0, a.indexOf(' ('));
 		OLYMPSbyName[olymp_name] = olymp_subj;
 	}
 	return OLYMPSbyName;
@@ -251,17 +250,17 @@ function loadOLYMPS() {
 
 // check current stream
 function checkSTREAM() {
-	var points, err_mes, err_count = 0, warn_count = 0, sum = 0;
-	var EGE_points = loadEGEpoints();
-	var OLYMPSbyName = loadOLYMPS();
-	var annul = (getID('APPL_STATUS').selectedIndex === 1);
-	var annul_text = 'Аннулировано ' + getID('APPL_ANN').textContent;
-	var curr_stream = getSelectedText(getID('APPL_PROG')).substr(0, 8);
-	var curr_olymp = getSelectedText(getID('APPL_OLYMP'));
-	var minpoints = getMinPoints(curr_stream);
-	var appl_usl = getID('APPL_USL').selectedIndex;
-	var isBVI = (appl_usl === 1);
-	var isOlymps = (getID('report_olymp_rep') !== null);
+	let points, err_mes, err_count = 0, warn_count = 0, sum = 0;
+	let EGE_points = loadEGEpoints();
+	let OLYMPSbyName = loadOLYMPS();
+	let annul = (getID('APPL_STATUS').selectedIndex === 1);
+	let annul_text = 'Аннулировано ' + getID('APPL_ANN').textContent;
+	let curr_stream = getSelectedText(getID('APPL_PROG')).substr(0, 8);
+	let curr_olymp = getSelectedText(getID('APPL_OLYMP'));
+	let minpoints = getMinPoints(curr_stream);
+	let appl_usl = getID('APPL_USL').selectedIndex;
+	let isBVI = (appl_usl === 1);
+	let isOlymps = (getID('report_olymp_rep') !== null);
 
 	if (getID('APPL_MEGA_N').selectedIndex === 1) {
 		NotifyErr(curr_stream + ': ИМРИП поменять на ТИНТ!')
@@ -278,9 +277,11 @@ function checkSTREAM() {
 			err_count++;
 		}
 		sum = 'БВИ';
+	} else if (appl_usl === 4) {
+		NotifyInfo('Гос. линия');
 	} else {
 		// не БВИ
-		for (var subj in minpoints) {
+		for (let subj in minpoints) {
 			points = EGE_points[subj];
 			console.log(subj + ' ' + minpoints[subj] + ':' + points);
 			if (points === undefined) {
@@ -330,7 +331,7 @@ function checkSTREAM() {
 				NotifyWarn('Обнаружены непроставленные олимпиады');
 			}
 		} else {
-			var curr_subj = OLYMPSbyName[curr_olymp];
+			let curr_subj = OLYMPSbyName[curr_olymp];
 			if (curr_olymp === 'Всероссийская олимпиада школьников') {
 				if (getVSEROS(curr_stream)[curr_subj]) {
 					if (isBVI) {
@@ -368,7 +369,7 @@ function checkSTREAM() {
 
 // listen application
 function checkAPPL() {
-	var HASH = document.location.hash;
+	let HASH = document.location.hash;
 	if (HASH === '#olymp') {
 		document.addEventListener('click', listenOLYMP);
 	} else {
@@ -381,7 +382,7 @@ function checkAPPL() {
 }
 
 function main() {
-	var url = document.location.href;
+	let url = document.location.href;
 	if ((url.includes('ST_FORM')) || (url.includes('=2175:2:'))) {
 		addCheckButton("Проверить олимпиады", "PERS_UPDATE", function() {
 			window.open(addAllOlympsCheck(), '_blank');
@@ -391,8 +392,8 @@ function main() {
 		checkAPPL();
 		window.addEventListener('hashchange', checkAPPL);
 	} else if ((url.includes('SU_OFFICE')) || (url.includes('=2175:5:'))) {
-		var LK_UPD = getID('LK_UPDATE');
-		var DZCH = getID('LK_DELO_0');
+		let LK_UPD = getID('LK_UPDATE');
+		let DZCH = getID('LK_DELO_0');
 		if (LK_UPD !== null) {
 			LK_UPD.onclick = checkBVIwoAGREE;
 		}
