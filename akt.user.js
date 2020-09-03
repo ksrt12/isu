@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        ПсевдоАКТы
-// @version     3.5
-// @date        2020-08-30
+// @version     3.6
+// @date        2020-09-03
 // @author      kazakovstepan
 // @namespace   ITMO University
 // @description Генерирует неотсорированный акт
@@ -29,7 +29,7 @@ if (HREF.includes("abit")) {
 }
 
 function make_export_isu() {
-	var result, json_data, delo_table, c = 0;
+	let result, json_data, delo_table, c = 0;
 	let isu_rep_num = document.querySelector("#report_list_paginate > ul");
 	let win = document.querySelector("#list > div > div.grid-container > div > div > div");
 	//let source = document.createElement("textarea"); source.type = "text";
@@ -94,9 +94,11 @@ function add_list(delo_table, json_data) {
 		let fio = i.querySelector("td:nth-child(2)");
 		if (json_data[fio.innerText]) {
 			tbody.appendChild(table_row([
+				json_data[fio.innerText].prikaz,
 				json_data[fio.innerText].usl,
 				json_data[fio.innerText].fac,
 				i.querySelector("td:nth-child(1)").innerText,
+				fio.innerText,
 				get_id(fio)
 			], false));
 		}
@@ -108,7 +110,7 @@ function get_id(elem) {
 	let a = document.createElement("a");
 	let pid = elem.querySelector("span:nth-child(2)").getAttribute("pid");
 	a.href = 'https://isu.ifmo.ru/pls/apex/f?p=2175:ST_FORM:114054305566429::::ST_ID:' + pid;
-	a.appendChild(document.createTextNode(elem.innerText));
+	a.appendChild(document.createTextNode(pid));
 	return a;
 }
 
@@ -124,8 +126,8 @@ function readFile(input) {
 
 function make_export(prikaz) {
 	let name = prikaz.innerText.substr(9);
-	let bvi = document.querySelector("body > div.main.page > section.static-page-rule > div > table > tbody > tr.hdr > td:nth-child(3)").innerText.includes("Олимпиа");
-	let result = make_akt_table(name.substring(0, 4), bvi);
+	let hdr = document.querySelector("body > div.main.page > section.static-page-rule > div > table > tbody > tr.hdr");
+	let result = make_akt_table(name.substring(0, 4), hdr);
 	let xls = make_dlink(name, result, "xls");
 	let json = make_dlink(name, result, "json");
 	let div = document.createElement("div");
@@ -182,20 +184,27 @@ function table_row(l, p) {
 	return tr;
 }
 
-function make_akt_table(prikaz_n, isBVI) {
+function make_akt_table(prikaz_n, hdr) {
 	let akt_json = {};
 	let akt_table = make_base_table('akt_table');
 	let tbody = akt_table.querySelector("tbody");
+	let bvi_gos;
+	if (hdr.querySelectorAll("td").length > 1) {
+		bvi_gos = (hdr.querySelector("td:nth-child(3)").innerText.includes("Олимпиа") === true) ? "БВИ" : false;
+	} else {
+		bvi_gos = "ГЛ";
+	}
 	for (let stream of document.querySelectorAll("body > div.main.page > section.static-page-rule > div > h3")) {
 		let str = stream.innerText;
 		for (let i of stream.nextElementSibling.querySelectorAll("tbody > tr")) {
 			if (i.className !== "hdr") {
-				let usl = isBVI ? "БВИ" : i.cells[1].innerText;
+				let usl = bvi_gos ? bvi_gos : i.cells[1].innerText;
 				let fac = getFAC(str.substr(0, 8), str);
 				let fio = i.cells[0].innerText;
 				let local_obj = {};
 				local_obj.fac = fac;
 				local_obj.usl = usl;
+				local_obj.prikaz = prikaz_n;
 				akt_json[fio] = local_obj;
 				tbody.appendChild(table_row([prikaz_n, usl, fio, fac], false));
 			}
