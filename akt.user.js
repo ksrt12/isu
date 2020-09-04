@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name        ПсевдоАКТы
-// @version     3.7
-// @date        2020-09-03
+// @name        АКТЫ
+// @version     3.8
+// @date        2020-09-04
 // @author      kazakovstepan
 // @namespace   ITMO University
 // @description Генерирует неотсорированный акт
@@ -19,13 +19,36 @@
 const HREF = document.location.href;
 var json_raw, json_raw_name;
 
-if (HREF.includes("abit")) {
-	window.onload = function() {
+window.addEventListener("load", function() {
+	if (HREF.includes("abit")) {
 		let prikaz = document.querySelector("body > div.main.page > section.static-page-rule > div > h1");
 		prikaz.after(make_export(prikaz));
-	};
-} else if (HREF.includes("isu")) {
-	make_export_isu();
+	} else if (HREF.includes("isu")) {
+		make_export_isu()
+	}
+})
+
+function make_button(name) {
+	let a = document.createElement("a");
+	a.type = "button";
+	a.className = "btn btn-labeled btn-xs btn-margined";
+	a.style.marginTop = "5px";
+	if (HREF.includes("abit")) {
+		a.style.marginRight = "5px";
+	}
+	a.style.marginBottom = "5px";
+	if (name) {
+		a.appendChild(make_text(name));
+	}
+	return a;
+}
+
+function checked_1000() {
+	return (document.querySelector("#report_list_length > label > select").selectedIndex === 6);
+}
+
+function make_text(str) {
+	return document.createTextNode(str);
 }
 
 function make_export_isu() {
@@ -33,9 +56,9 @@ function make_export_isu() {
 	let isu_rep_num = document.querySelector("#report_list_paginate > ul");
 	let win = document.querySelector("#list > div > div.grid-container > div > div > div");
 	//let source = document.createElement("textarea"); source.type = "text";
-	let source = document.createElement("input"); source.type = "file";
-	let load = document.createElement("a"); load.style = "margin-right: 5px; cursor: pointer;";	load.text = "LOAD";
-	let run = document.createElement("a"); run.style = "margin-right: 5px; cursor: pointer;"; run.text = "RUN";
+	let source = document.createElement("input"); source.type = "file"; source.style.marginBottom = "5px";
+	let load = make_button("LOAD");
+	let run = make_button("RUN");
 	if (source.type === "file") {
 		source.onchange = function() {
 			try {
@@ -50,9 +73,14 @@ function make_export_isu() {
 		json_data = result[1];
 		delo_table = result[0];
 		if (json_data) {
-			source.style.display = "none";
-			load.style.display = "none";
-			source.after(run);
+			if (checked_1000()) {
+				G2.notify("JSON загружен!");
+				source.style.display = "none";
+				load.style.display = "none";
+				source.after(run);
+			} else {
+				G2.notify("Выбирите 1000 дел!", null, false, true);
+			}
 		}
 	};
 	run.onclick = function() {
@@ -79,7 +107,6 @@ function run_search(input) {
 	let json_data, delo_table = make_base_table('delo_table');
 	try {
 		json_data = JSON.parse(to_json);
-		G2.notify("JSON загружен!");
 	} catch(err) {
 		G2.notify("Некорректный JSON!", 'Ошибка', true);
 		json_data = false;
@@ -110,7 +137,7 @@ function get_id(elem) {
 	let a = document.createElement("a");
 	let pid = elem.querySelector("span:nth-child(2)").getAttribute("pid");
 	a.href = 'https://isu.ifmo.ru/pls/apex/f?p=2175:SU_OFFICE:101431868275662:GET:NO::ST_ID:' + pid;
-	a.appendChild(document.createTextNode(pid));
+	a.appendChild(make_text(pid));
 	return a;
 }
 
@@ -138,16 +165,18 @@ function make_export(prikaz) {
 }
 
 function make_dlink(name, source, forma) {
-	var a = document.createElement("a");
+	let a = make_button();
+	let span = document.createElement("span");
+	span.className = "btn-label icon fa fa-file-excel-o";
+	a.href = (forma === "xls" ) ? akt_to_xls(source[0], name) : akt_to_json(source[1]);
 	a.id = "akt_" + forma;
-	a.insertAdjacentHTML('beforeend', "Акт." + forma);
-	a.style = "margin-right: 5px; cursor: pointer;";
 	a.download = (name + '.' + forma).replace(/ /g, '_');
-	a.href = (forma === "xls" ) ? akt_xls(source[0], name) : akt_json(source[1]);
+	a.appendChild(span);
+	a.appendChild(make_text("Акт." + forma));
 	return a;
 }
 
-function akt_xls(table, name) {
+function akt_to_xls(table, name) {
 	const uri = 'data:application/vnd.ms-excel;base64,',
 		template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>';
 	function base64(s) { return window.btoa(unescape(encodeURIComponent(s))) }
@@ -156,15 +185,15 @@ function akt_xls(table, name) {
 	return uri + base64(format(template, ctx));
 }
 
-function akt_json(json_data) {
+function akt_to_json(json_data) {
 	return URL.createObjectURL(new Blob([JSON.stringify(json_data)], {type: 'text/plain'}));
 }
 
 function add_entry(x, tgt) {
 	if (typeof(x) == 'string') {
-		tgt.appendChild(document.createTextNode(x));
+		tgt.appendChild(make_text(x));
 	} else if (typeof(x) == 'number') {
-		tgt.appendChild(document.createTextNode('' + x));
+		tgt.appendChild(make_text('' + x));
 	} else if (Array.isArray(x)) {
 		for (let i in x) {
 			add_entry(x[i], tgt);
@@ -188,12 +217,8 @@ function make_akt_table(prikaz_n, hdr) {
 	let akt_json = {};
 	let akt_table = make_base_table('akt_table');
 	let tbody = akt_table.querySelector("tbody");
-	let bvi_gos;
-	if (hdr.querySelectorAll("td").length > 1) {
-		bvi_gos = (hdr.querySelector("td:nth-child(3)").innerText.includes("Олимпиа") === true) ? "БВИ" : false;
-	} else {
-		bvi_gos = "ГЛ";
-	}
+	let length = hdr.querySelectorAll("td").length;
+	let bvi_gos = (length === 0) ? "ГЛ" : (length >= 3) ? (hdr.querySelector("td:nth-child(3)").innerText.includes("Олимпиа") === true) ? "БВИ" : false : false;
 	for (let stream of document.querySelectorAll("body > div.main.page > section.static-page-rule > div > h3")) {
 		let str = stream.innerText;
 		for (let i of stream.nextElementSibling.querySelectorAll("tbody > tr")) {
