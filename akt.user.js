@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        АКТЫ
-// @version     3.8
+// @version     3.9
 // @date        2020-09-04
 // @author      kazakovstepan
 // @namespace   ITMO University
@@ -28,15 +28,26 @@ window.addEventListener("load", function() {
 	}
 })
 
-function make_button(name) {
+function make_button(name, span_class) {
 	let a = document.createElement("a");
 	a.type = "button";
 	a.className = "btn btn-labeled btn-xs btn-margined";
-	a.style.marginTop = "5px";
+	a.style.marginTop = "6px";
+	a.style.marginBottom = "6px";
+	a.style.fontSize = "13px";
 	if (HREF.includes("abit")) {
 		a.style.marginRight = "5px";
+		a.style.marginLeft = "0px";
+	} else {
+		let span = document.createElement("span");
+		span.className = "btn-label icon fa " + span_class;
+		span.style.fontSize = "12px";
+		span.style.marginRight = "7px";
+		a.appendChild(span);
+		if (span_class.includes("download")) {
+			a.style.marginLeft = "6px";
+		}
 	}
-	a.style.marginBottom = "5px";
 	if (name) {
 		a.appendChild(make_text(name));
 	}
@@ -56,9 +67,9 @@ function make_export_isu() {
 	let isu_rep_num = document.querySelector("#report_list_paginate > ul");
 	let win = document.querySelector("#list > div > div.grid-container > div > div > div");
 	//let source = document.createElement("textarea"); source.type = "text";
-	let source = document.createElement("input"); source.type = "file"; source.style.marginBottom = "5px";
-	let load = make_button("LOAD");
-	let run = make_button("RUN");
+	let source = document.createElement("input"); source.type = "file"; //source.style.marginBottom = "5px";
+	let load = make_button("LOAD", "fa-upload");
+	let run = make_button("RUN", "fa-refresh");
 	if (source.type === "file") {
 		source.onchange = function() {
 			try {
@@ -165,14 +176,10 @@ function make_export(prikaz) {
 }
 
 function make_dlink(name, source, forma) {
-	let a = make_button();
-	let span = document.createElement("span");
-	span.className = "btn-label icon fa fa-file-excel-o";
+	let a = make_button("Акт." + forma, "fa-download");
 	a.href = (forma === "xls" ) ? akt_to_xls(source[0], name) : akt_to_json(source[1]);
 	a.id = "akt_" + forma;
 	a.download = (name + '.' + forma).replace(/ /g, '_');
-	a.appendChild(span);
-	a.appendChild(make_text("Акт." + forma));
 	return a;
 }
 
@@ -181,12 +188,12 @@ function akt_to_xls(table, name) {
 		template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>';
 	function base64(s) { return window.btoa(unescape(encodeURIComponent(s))) }
 	function format(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; })}
-	let ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+	let ctx = {worksheet: name, table: table.innerHTML};
 	return uri + base64(format(template, ctx));
 }
 
 function akt_to_json(json_data) {
-	return URL.createObjectURL(new Blob([JSON.stringify(json_data)], {type: 'text/plain'}));
+	return URL.createObjectURL(new Blob([JSON.stringify(json_data)], {type: 'application/json'}));
 }
 
 function add_entry(x, tgt) {
