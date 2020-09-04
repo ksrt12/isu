@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Абитуриент
-// @version     6.8.1
-// @date        2020-09-02
+// @version     6.8.2
+// @date        2020-09-04
 // @author      kazakovstepan
 // @namespace   ITMO University
 // @description IT's MOre than the Система Абитуриент
@@ -41,11 +41,14 @@ function addCheckButton(str, ISUid, func) {
 	let CheckButton = document.createElement("button");
 		CheckButton.id = "ButCheck";
 		CheckButton.value = str;
-		CheckButton.className = "btn btn-labeled ";
+		CheckButton.className = "btn btn-labeled";
 		CheckButton.type = "button";
-		CheckButton.style = "margin-right: 5px;";
+		CheckButton.style.marginRight = "5px";
 		ISUELEM.parentNode.insertBefore(CheckButton, ISUELEM);
-		CheckButton.insertAdjacentHTML('beforeend', '<span class="btn-label icon fa fa-refresh"></span>' + str);
+	let span = document.createElement("span");
+		span.className = "btn-label icon fa fa-refresh";
+		CheckButton.appendChild(span);
+		CheckButton.appendChild(document.createTextNode(str));
 		CheckButton.onclick = func;
 	}
 }
