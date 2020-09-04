@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        ПсевдоАКТы
-// @version     3.6
+// @version     3.7
 // @date        2020-09-03
 // @author      kazakovstepan
 // @namespace   ITMO University
@@ -96,11 +96,11 @@ function add_list(delo_table, json_data) {
 			tbody.appendChild(table_row([
 				json_data[fio.innerText].prikaz,
 				json_data[fio.innerText].usl,
+				get_id(fio),
 				json_data[fio.innerText].fac,
 				i.querySelector("td:nth-child(1)").innerText,
-				fio.innerText,
-				get_id(fio)
-			], false));
+				fio.innerText
+			]));
 		}
 	}
 	return delo_table;
@@ -109,7 +109,7 @@ function add_list(delo_table, json_data) {
 function get_id(elem) {
 	let a = document.createElement("a");
 	let pid = elem.querySelector("span:nth-child(2)").getAttribute("pid");
-	a.href = 'https://isu.ifmo.ru/pls/apex/f?p=2175:ST_FORM:114054305566429::::ST_ID:' + pid;
+	a.href = 'https://isu.ifmo.ru/pls/apex/f?p=2175:SU_OFFICE:101431868275662:GET:NO::ST_ID:' + pid;
 	a.appendChild(document.createTextNode(pid));
 	return a;
 }
@@ -174,7 +174,7 @@ function add_entry(x, tgt) {
 	}
 }
 
-function table_row(l, p) {
+function table_row(l) {
 	let tr = document.createElement('tr');
 	for (let i in l) {
 		let g = document.createElement('td');
@@ -206,7 +206,7 @@ function make_akt_table(prikaz_n, hdr) {
 				local_obj.usl = usl;
 				local_obj.prikaz = prikaz_n;
 				akt_json[fio] = local_obj;
-				tbody.appendChild(table_row([prikaz_n, usl, fio, fac], false));
+				tbody.appendChild(table_row([prikaz_n, usl, fio, fac]));
 			}
 		}
 	}
