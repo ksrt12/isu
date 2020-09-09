@@ -1,1 +1,0 @@
-javascript:window.open('https://diploma.rsr-olymp.ru/files/rsosh-diplomas-static/compiled-storage-'+document.getElementById('OLYMP_YEAR').value+'/by-code/'+document.getElementById('OLYMP_NUM').value.replace(/[. -]+/g, "")+'/white.pdf');
