@@ -7,8 +7,8 @@
 // @description Генерирует неотсорированный акт
 // @homepage    https://vk.com/kazakovstepan
 // @icon        https://isu.ifmo.ru/i/libraries/frontend/misc/favicon.ico
-// @updateURL   https://ksrt12.github.io/isu/akt.user.js
-// @downloadURL https://ksrt12.github.io/isu/akt.user.js
+// @updateURL   https://snegiry.art/isu/akt.user.js
+// @downloadURL https://snegiry.art/isu/akt.user.js
 // @match       https://abit.itmo.ru/order/*
 // @match       https://isu.ifmo.ru/pls/apex/f?p=2175:9:*
 // @run-at      document-end

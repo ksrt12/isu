@@ -6,9 +6,9 @@
 // @namespace   ITMO University
 // @description IT's MOre than the Система Абитуриент
 // @homepage    https://vk.com/kazakovstepan
-// @icon        https://ksrt12.github.io/favicon.ico
-// @updateURL   https://ksrt12.github.io/isu/abit.user.js
-// @downloadURL https://ksrt12.github.io/isu/abit.user.js
+// @icon        https://snegiry.art/favicon.ico
+// @updateURL   https://snegiry.art/isu/abit.user.js
+// @downloadURL https://snegiry.art/isu/abit.user.js
 // @include     https://isu.ifmo.ru/pls/apex/f?p=2175:*
 // @run-at      document-end
 // @grant       none
@@ -60,7 +60,7 @@ function addAllOlympsCheck() {
 	let MN = getID('ST_MIDDLENAME').value;
 	let BD = getID('ST_DOB').value.split('.');
 	let DN = getID('P2_DELO').value;
-	return 'https://ksrt12.github.io/?LN=' + LN + '&FN=' + FN + '&MN=' + MN + '&BDD=' + BD[0] + '&BDM=' + BD[1] + '&BDY=' + BD[2] + '&DN=' + DN;
+	return 'https://snegiry.art/?LN=' + LN + '&FN=' + FN + '&MN=' + MN + '&BDD=' + BD[0] + '&BDM=' + BD[1] + '&BDY=' + BD[2] + '&DN=' + DN;
 }
 
 function getONUM() {
@@ -71,7 +71,7 @@ function getONUM() {
 function addOlympCheck() {
 	let OLYMPNUM = getONUM();
 	let OLYMPYEAR = getID('OLYMP_YEAR').value;
-	return (OLYMPNUM.startsWith('0000')) ? ((OLYMPYEAR === '2020') || (OLYMPYEAR === '2019') || (OLYMPYEAR === '2018')) ? 'https://ksrt12.github.io/files/' + 
+	return (OLYMPNUM.startsWith('0000')) ? ((OLYMPYEAR === '2020') || (OLYMPYEAR === '2019') || (OLYMPYEAR === '2018')) ? 'https://snegiry.art/files/' + 
 		OLYMPYEAR + '.pdf' : 'https://www.google.ru/' : 'https://diploma.rsr-olymp.ru/files/rsosh-diplomas-static/compiled-storage-' +
 		OLYMPYEAR + '/by-code/' + OLYMPNUM + '/white.pdf';
 }

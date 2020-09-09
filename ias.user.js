@@ -7,8 +7,8 @@
 // @description Считает текущий средний балл
 // @homepage    https://vk.com/kazakovstepan
 // @icon        https://isu.ifmo.ru/i/libraries/frontend/misc/favicon.ico
-// @updateURL   https://ksrt12.github.io/isu/ias.user.js
-// @downloadURL https://ksrt12.github.io/isu/ias.user.js
+// @updateURL   https://snegiry.art/isu/ias.user.js
+// @downloadURL https://snegiry.art/isu/ias.user.js
 // @match       https://isu.ifmo.ru/pls/apex/f?p=2437:110:*
 // @run-at      document-end
 // @grant       none

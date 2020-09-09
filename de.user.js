@@ -7,8 +7,8 @@
 // @description  Make описи great again!
 // @homepage     https://vk.com/kazakovstepan
 // @icon         https://isu.ifmo.ru/i/libraries/frontend/misc/favicon.ico
-// @updateURL    https://ksrt12.github.io/isu/de.user.js
-// @downloadURL  https://ksrt12.github.io/isu/de.user.js
+// @updateURL    https://snegiry.art/isu/de.user.js
+// @downloadURL  https://snegiry.art/isu/de.user.js
 // @match        https://abit.itmo.ru/ums/system/print/bachelor/*
 // @grant        none
 // @run-at       document-start
