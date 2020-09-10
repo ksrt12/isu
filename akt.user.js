@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        АКТЫ
-// @version     3.9
+// @version     3.9.1
 // @date        2020-09-04
 // @author      kazakovstepan
 // @namespace   ITMO University
@@ -225,7 +225,7 @@ function make_akt_table(prikaz_n, hdr) {
 	let akt_table = make_base_table('akt_table');
 	let tbody = akt_table.querySelector("tbody");
 	let length = hdr.querySelectorAll("td").length;
-	let bvi_gos = (length === 0) ? "ГЛ" : (length >= 3) ? (hdr.querySelector("td:nth-child(3)").innerText.includes("Олимпиа") === true) ? "БВИ" : false : false;
+	let bvi_gos = (length === 1) ? "ГЛ" : (length >= 3) ? (hdr.querySelector("td:nth-child(3)").innerText.includes("Олимпиа") === true) ? "БВИ" : false : false;
 	for (let stream of document.querySelectorAll("body > div.main.page > section.static-page-rule > div > h3")) {
 		let str = stream.innerText;
 		for (let i of stream.nextElementSibling.querySelectorAll("tbody > tr")) {
