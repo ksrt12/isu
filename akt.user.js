@@ -20,10 +20,10 @@ const HREF = document.location.href;
 var json_raw, json_raw_name;
 
 window.addEventListener("load", function() {
-	if (HREF.includes("abit")) {
+	if (HREF.includes("abit.itmo")) {
 		let prikaz = document.querySelector("body > div.main.page > section.static-page-rule > div > h1");
 		prikaz.after(make_export(prikaz));
-	} else if (HREF.includes("isu")) {
+	} else if (HREF.includes("isu.ifmo")) {
 		make_export_isu()
 	}
 })
