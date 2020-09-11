@@ -176,7 +176,7 @@ function make_export(prikaz) {
 }
 
 function make_dlink(name, source, forma) {
-	let a = make_button("Акт." + forma, "fa-download");
+	let a = make_button(name + '.' + forma, "fa-download");
 	a.href = (forma === "xls" ) ? akt_to_xls(source[0], name) : akt_to_json(source[1]);
 	a.id = "akt_" + forma;
 	a.download = (name + '.' + forma).replace(/ /g, '_');

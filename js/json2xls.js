@@ -4,31 +4,30 @@
 
 window.addEventListener("DOMContentLoaded", main)
 let out2 = {};
+let first, second;
 
 function main() {
-	const div = document.querySelector("#main");
-	let jsons, download;
-	
-	let load = document.createElement("button");
-	load.appendChild(document.createTextNode("LOAD"));
-	load.style.width = "fit-content";
-	load.onclick = () => mergeJSONs(div);
-	
-	let source = document.createElement("input");
-	source.type = "file"; 
-	source.multiple = true;
-	source.accept = "application/json";
-	source.onchange = function() {
-		try {
-			readFiles(source);
-		} catch(err) {
-			console.log(err);
+	first = document.querySelector("#first");
+	second = document.querySelector("#second");	
+}
+
+function load_files() {
+	check_old();
+	try {
+		readFiles(source);
+		document.querySelector("#merge").style.display = "";
+	} catch(err) {
+		console.log(err);
+	}
+}
+
+function check_old() {
+	for (let f of ["akt_json", "akt_xls"]) {
+		let old = document.querySelector("#" + f);
+		if (old) {
+			old.remove();
 		}
 	}
-	
-	div.appendChild(source);
-	div.appendChild(load);
-	
 }
 
 function readFiles(input, retout) {
@@ -57,9 +56,22 @@ async function readToText(file) {
     });
 };
 
-function mergeJSONs(div) {
+function mergeJSONs() {
 	if (out2) {
-		let download = make_dlink("IntJSON", [null, out2], "json");
-		div.appendChild(download);
+		let json = make_dlink("JSON_merged", [null, out2], "json");
+		first.appendChild(json);
+		second.style.display = "";
 	}
+}
+
+function do_json2xls() {
+	let akt_table = make_base_table('akt_table');
+	let tbody = akt_table.querySelector("tbody");
+	
+	for (let key of Object.keys(out2)) {
+		tbody.appendChild(table_row([out2[key].prikaz, out2[key].usl, key, out2[key].fac]));
+	}
+
+	let xls = make_dlink("JSON_merged", [akt_table, null], "xls");
+	second.appendChild(xls);
 }

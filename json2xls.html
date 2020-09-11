@@ -8,7 +8,8 @@
 <style>
 body { padding: 0; font-family: sans-serif; }
 .license-text { background-color: #eeeeee; border-top: 20px solid white; padding: 10px; }
-div * { margin-bottom: 5px; }
+div * { display: flex; margin-bottom: 5px; }
+button { width: fit-content; }
 </style>
 <link rel="apple-touch-icon" sizes="120x120" href="../icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="16x16" href="../icons/favicon-16x16.png">
@@ -22,8 +23,16 @@ div * { margin-bottom: 5px; }
 </head>
 
 <body>
-	<p class="license-text">OAOAOAOA</p>
-	<div id="main" style="display: flex; flex-direction: column;"></div>
+	<p class="license-text">Объединение JSON-файлов и конвертация в XLS</p>
+	<div id="main" style="flex-direction: column;">
+		<input id="source" type="file" multiple accept="application/json" onchange="load_files()">
+		<div id="first">
+			<button id="merge" style="display:none" onclick="mergeJSONs()">MERGE</button>
+		</div>
+		<div id="second" style="display:none">
+			<button id="convert" onclick="do_json2xls()">JSON2XLS</button>
+		</div>
+	</div>
 </body>
 
 </html>
