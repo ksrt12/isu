@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Средний балл
-// @version     1.2
-// @date        2020-09-02
+// @version     1.3
+// @date        2021-01-26
 // @author      kazakovstepan
 // @namespace   ITMO University
 // @description Считает текущий средний балл
@@ -15,55 +15,55 @@
 // ==/UserScript==
 
 var sum = 0,
-	c = 0;
+    c = 0;
 
 function make_sum(table_num, col_name, col_point) {
-	let json = {};
-	const curr_table = document.querySelectorAll("#scrolltable-" + table_num + " > tbody > tr");
-	for (let i of curr_table) {
-		let a = i.querySelector("td:nth-child(" + col_point + ")");
-		if (a) {
-			let b = Number(a.innerText);
-			if (!isNaN(b) && (b !== 0)) {
-				let subj = i.querySelector("td:nth-child(" + col_name + ")").innerText;
-				let curr_subj = json[subj];
-				if (curr_subj) {
-					curr_subj.mark += b;
-					curr_subj.count += 1;
-				} else {
-					json[subj] = {};
-					json[subj].mark = b;
-					json[subj].count = 1;
-				}
-			}
-		}
-	}
+    let json = {};
+    const curr_table = document.querySelectorAll("#scrolltable-" + table_num + " > tbody > tr");
+    for (let i of curr_table) {
+        let a = i.querySelector("td:nth-child(" + col_point + ")");
+        if (a) {
+            let b = Number(a.innerText);
+            if (!isNaN(b) && (b !== 0)) {
+                let subj = i.querySelector("td:nth-child(" + col_name + ")").innerText;
+                let curr_subj = json[subj];
+                if (curr_subj) {
+                    curr_subj.mark += b;
+                    curr_subj.count += 1;
+                } else {
+                    json[subj] = {};
+                    json[subj].mark = b;
+                    json[subj].count = 1;
+                }
+            }
+        }
+    }
 
-	for (let subj of Object.keys(json)) {
-		let curr_subj = json[subj];
-		if (curr_subj.count > 1) {
-			json[subj].mark = Number((curr_subj.mark / curr_subj.count).toFixed(0));
-			json[subj].count = 1;
-		}
-		sum += json[subj].mark;
-		c++;
-	}
+    for (let subj of Object.keys(json)) {
+        let curr_subj = json[subj];
+        if (curr_subj.count > 1) {
+            json[subj].mark = Number((curr_subj.mark / curr_subj.count).toFixed(0));
+            json[subj].count = 1;
+        }
+        sum += json[subj].mark;
+        c++;
+    }
 }
 
 window.addEventListener("load", function() {
-	make_sum(1, 1, 8);
-	make_sum(2, 2, 5);
-	make_sum(3, 2, 7);
-	let m = (sum / c).toFixed(4);
-	let str = 'Средний балл: ' + m;
-	G2.notify(str);
+    make_sum(1, 1, 8);
+    make_sum(2, 2, 5);
+    make_sum(3, 2, 8);
+    let m = (sum / c).toFixed(4);
+    let str = 'Средний балл: ' + m;
+    G2.notify(str);
 
-	let P = document.createElement('h4');
-	P.prepend(document.createTextNode(str));
+    let P = document.createElement('h4');
+    P.prepend(document.createTextNode(str));
 
-	let VKR = document.querySelectorAll("h4").item(3);
-	if (VKR) {
-		VKR.before(P);
-		P.after(document.createElement('br'));
-	}
+    let VKR = document.querySelectorAll("h4").item(3);
+    if (VKR) {
+        VKR.before(P);
+        P.after(document.createElement('br'));
+    }
 });
