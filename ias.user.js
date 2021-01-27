@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Средний балл
-// @version     1.3
-// @date        2021-01-26
+// @version     1.4
+// @date        2021-01-27
 // @author      kazakovstepan
 // @namespace   ITMO University
 // @description Считает текущий средний балл
@@ -50,20 +50,32 @@ function make_sum(table_num, col_name, col_point) {
     }
 }
 
-window.addEventListener("load", function() {
+function get_sum() {
     make_sum(1, 1, 8);
     make_sum(2, 2, 5);
     make_sum(3, 2, 8);
-    let m = (sum / c).toFixed(4);
-    let str = 'Средний балл: ' + m;
+    return 'Средний балл: ' + (sum / c).toFixed(4);
+}
+
+function update_sum() {
+    sum = 0;
+    c = 0;
+    let str = get_sum();
     G2.notify(str);
+    document.querySelector("#ias").textContent = str;
+}
+
+window.addEventListener("load", function() {
 
     let P = document.createElement('h4');
-    P.prepend(document.createTextNode(str));
+    P.id = "ias";
+    P.style.cursor = "pointer";
+    P.onclick = () => { update_sum(); };
 
     let VKR = document.querySelectorAll("h4").item(3);
-    if (VKR) {
+    if (VKR && (document.querySelector("#ias") === null)) {
         VKR.before(P);
         P.after(document.createElement('br'));
+        update_sum();
     }
 });
