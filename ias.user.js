@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Средний балл
-// @version     1.4
+// @version     1.4.1
 // @date        2021-01-27
 // @author      kazakovstepan
 // @namespace   ITMO University
@@ -24,7 +24,7 @@ function make_sum(table_num, col_name, col_point) {
         let a = i.querySelector("td:nth-child(" + col_point + ")");
         if (a) {
             let b = Number(a.innerText);
-            if (!isNaN(b) && (b !== 0)) {
+            if (!isNaN(b) && (b !== 0) && (b !== 2)) {
                 let subj = i.querySelector("td:nth-child(" + col_name + ")").innerText;
                 let curr_subj = json[subj];
                 if (curr_subj) {
