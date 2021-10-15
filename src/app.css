@@ -3,10 +3,31 @@ body {
     font-family: sans-serif;
 }
 
+#root {
+    padding: 0 2rem;
+}
+
 .license-text {
     background-color: #eeeeee;
     border-top: 20px solid white;
     padding: 10px;
+}
+
+#main {
+    display: flex;
+    flex-direction: column;
+    width: 15rem;
+    padding-left: 40px;
+}
+
+#main > * {
+    padding-top: 1rem;
+}
+
+.between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .copyright {

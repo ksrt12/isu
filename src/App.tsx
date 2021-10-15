@@ -1,14 +1,11 @@
 import { BrowserRouter, Switch, Route } from "react-router-dom";
-import MainPage from "./Pages/MainPage";
-import MergePage from "./Pages/MergePage";
+import MainPage from "./pages/MainPage";
+import MergePage from "./pages/MergePage";
 import "./app.css";
 
 const App: React.FC = () => {
     return (
         <>
-            <p className="license-text">
-                UserScripts for ISU  ABIT systems
-            </p>
             <BrowserRouter>
                 <Switch>
                     <Route component={MainPage} path="/" exact />
