@@ -1,26 +1,26 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Switch, Route } from "react-router-dom";
+import MainPage from "./Pages/MainPage";
+import MergePage from "./Pages/MergePage";
+import "./app.css";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App: React.FC = () => {
+    return (
+        <>
+            <p className="license-text">
+                UserScripts for ISU  ABIT systems
+            </p>
+            <BrowserRouter>
+                <Switch>
+                    <Route component={MainPage} path="/" exact />
+                    <Route component={MergePage} path="/json2xls" />
+                </Switch>
+            </BrowserRouter>
+
+            <div className="copyright">
+                <a href="https://vk.com/kazakovstepan">&copy; 2020-2021, kazakovstepan</a>
+            </div>
+        </>
+    );
+};
 
 export default App;
