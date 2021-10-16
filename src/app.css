@@ -24,6 +24,10 @@ body {
     padding-top: 1rem;
 }
 
+li {
+    padding-top: 4px;
+}
+
 .between {
     display: flex;
     align-items: center;
