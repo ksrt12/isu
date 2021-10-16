@@ -1,28 +1,4 @@
-interface Imeta {
-    small: boolean,
-    grad: string;
-}
-
-interface Iperson {
-    fac: string,
-    usl: string;
-    stream: string,
-}
-
-interface Idata {
-    [key: string]: Iperson;
-}
-
-interface IJson {
-    info: Imeta;
-    data: Idata;
-}
-
-interface IpostGradJson {
-    [key: string]: {
-        [key: string]: number;
-    };
-}
+import { IAllJson } from "./interfaces";
 
 function makeButton(name: string, span_class?: string, abit?: boolean) {
     const a = document.createElement("a");
@@ -42,7 +18,7 @@ function makeButton(name: string, span_class?: string, abit?: boolean) {
     return a;
 }
 
-function makeDlink(name: string, source: IJson | IpostGradJson | HTMLTableElement, form: string, rename = name) {
+function makeDlink(name: string, source: IAllJson | HTMLTableElement, form: string, rename = name) {
     const xls = (source instanceof HTMLTableElement);
     const a = makeButton(`${rename}.${form}`, xls ? "fa-file-excel-o" : "fa-download");
     a.href = xls ? akt2xls(source, name) : akt2json(source);
@@ -51,16 +27,20 @@ function makeDlink(name: string, source: IJson | IpostGradJson | HTMLTableElemen
 }
 
 function akt2xls(table: HTMLTableElement, name: string) {
+    interface Ictx {
+        worksheet: string;
+        table: string;
+    }
     const uri = 'data:application/vnd.ms-excel;base64,',
         template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>',
-        ctx = { worksheet: name, table: table.innerHTML },
-        base64 = (s: string | number | boolean) => window.btoa(unescape(encodeURIComponent(s))),
-        format = (s: string, c: { [x: string]: any; worksheet?: any; table?: any; }) => s.replace(/{(\w+)}/g, (m: any, p: string | number) => c[p]);
+        ctx: Ictx = { worksheet: name, table: table.innerHTML },
+        base64 = (s: string) => window.btoa(unescape(encodeURIComponent(s))),
+        format = (s: string, c: Ictx) => s.replace(/{(\w+)}/g, (_, p: string) => c[p as keyof Ictx]);
 
     return uri + base64(format(template, ctx));
 }
 
-function akt2json(json_data: IJson | IpostGradJson | Idata) {
+function akt2json(json_data: IAllJson) {
     return URL.createObjectURL(new Blob([JSON.stringify(json_data)], { type: 'application/json' }));
 }
 
@@ -111,4 +91,3 @@ async function readToText(file: Blob): Promise<string> {
 }
 
 export { makeBaseTable, tableRow, makeButton, makeDlink, akt2json, akt2xls, readToText };
-export type { Imeta, Idata, Iperson, IJson, IpostGradJson };

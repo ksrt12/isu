@@ -52,3 +52,9 @@ li {
 .copyright a:visited {
     color: black;
 }
+
+@media (max-width: 930px), (orientation: portrait) {
+    #root {
+        padding: 0;
+    }
+}

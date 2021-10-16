@@ -5,9 +5,7 @@ import { Idata, IJson, Imeta } from "../ts/interfaces";
 import { akt2json, akt2xls, makeBaseTable, readToText, tableRow } from "../ts/utils";
 import MakeBtn from "../tsx/MakeBtn";
 
-interface MergePageProps { }
-
-const MergePage: React.FC<MergePageProps> = () => {
+const MergePage: React.FC = () => {
     const [disMergeBtn, setDisMergeBtn] = useState(true);
     const [disConvertBtn, setDisConvertBtn] = useState(true);
     const [disDiff, setDisDiff] = useState(true);

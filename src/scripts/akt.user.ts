@@ -33,37 +33,44 @@ function Info(str: string) {
     G2.notify(str);
 }
 
-interface TD extends HTMLTableCellElement { }
-interface TR extends HTMLTableRowElement { }
+type TD = HTMLTableCellElement;
+type TR = HTMLTableRowElement;
 
-interface Imeta {
+interface IMeta {
     small: boolean,
     grad: string;
 }
 
-interface Iperson {
+interface IPerson {
     fac: string,
     usl: string;
     stream: string,
 }
 
-interface Idata {
-    [key: string]: Iperson;
+interface IData {
+    [key: string]: IPerson;
 }
 
 interface IJson {
-    info: Imeta;
-    data: Idata;
+    info: IMeta;
+    data: IData;
 }
 
-interface IpostGradJson {
+interface IJsonPost {
     [key: string]: {
         [key: string]: number;
     };
 }
 
+interface IResult {
+    akt_table?: HTMLTableElement;
+    akt_json: IJson | IJsonPost;
+    count: number;
+    dubles?: HTMLTableElement | undefined;
+}
+
 const abit = isSite("abit.itmo");
-const recomm = isSite('bachelor/rating');
+const recomm = isSite("bachelor/rating");
 let json_raw: string, file_name: string;
 let source: HTMLInputElement, go: HTMLAnchorElement, clear: HTMLAnchorElement;
 
@@ -77,7 +84,7 @@ window.addEventListener("load", () => {
 });
 
 function makeExport(prikaz: string) {
-    let name, result;
+    let name: string, result: IResult;
     if (recomm) {
         const n = prikaz.search("\n") + 1;
         name = prikaz.substring(n, n + 8);
@@ -86,7 +93,7 @@ function makeExport(prikaz: string) {
         name = "Postgraduate";
         result = postgraduate();
     } else {
-        const page = document.querySelector("body > div.main.page > section.static-page-rule > div") as HTMLElement;
+        const page = document.querySelector("body > div.main.page > section.static-page-rule > div") as HTMLDivElement;
         const grad = isMaga(page.querySelector("h3")!.innerText) ? "M" : "B";
         name = grad + ' ' + prikaz.substring(9).toLowerCase();
         result = makeAktTable(page.querySelector("table > tbody > tr.hdr")!.childElementCount, grad);
@@ -192,7 +199,7 @@ function createReport(old_table: HTMLTableElement, json: IJson, keys: string[]) 
         const mess = `Найдено ключей: ${new_keys.length} из ${keys.length}`;
         if (diff.length) {
             Warn(mess);
-            const notfound = { xls: makeBaseTable(), json: { info: json.info, data: {} as Idata } };
+            const notfound = { xls: makeBaseTable(), json: { info: json.info, data: {} as IData } };
             for (const i of diff) {
                 createFullTable(notfound.xls.tBodies[0], json.data, false, i);
                 notfound.json.data[i] = json.data[i];
@@ -207,11 +214,10 @@ function createReport(old_table: HTMLTableElement, json: IJson, keys: string[]) 
     }
 }
 
-function addList(delo_table: HTMLTableElement, data: Idata, info: Imeta) {
+function addList(delo_table: HTMLTableElement, data: IData, info: IMeta) {
     let count = 0;
     const isu_tbt = document.querySelectorAll<TR>("#report_list > tbody > tr[role]");
     const tbody = delo_table.querySelector("tbody")!;
-    const small = info.small;
     for (const i of isu_tbt) {
         const fio_id = i.querySelector("td:nth-child(2)") as TD;
         const fio = fio_id.innerText;
@@ -244,7 +250,7 @@ function addList(delo_table: HTMLTableElement, data: Idata, info: Imeta) {
                 data[fio].fac, // Факультет
                 fio // ФИО
             ];
-            if (!small) {
+            if (!info.small) {
                 toTable.push(
                     "01.09.2021", // Дата
                     "50 л., ЭПК ст. 450", // срок хранения
@@ -301,10 +307,10 @@ function getID(elem: HTMLElement) {
     return a;
 }
 
-function makeAktTable(hdr: number | string, grad: string) {
+function makeAktTable(hdr: number | string, grad: string): IResult {
     let count = 0;
-    const akt_meta: Imeta = { small: recomm, grad: grad };
-    const akt_data: Idata = {};
+    const akt_meta: IMeta = { small: recomm, grad: grad };
+    const akt_data: IData = {};
     const akt_table = makeBaseTable();
     const dubl_table = makeBaseTable();
     const tbody = akt_table.querySelector("tbody")!;
@@ -337,14 +343,14 @@ function makeAktTable(hdr: number | string, grad: string) {
         akt_table: akt_table,
         akt_json: { info: akt_meta, data: akt_data },
         count: count,
-        dubles: (dubl.hasChildNodes()) ? dubl_table : null
+        dubles: (dubl.hasChildNodes()) ? dubl_table : undefined
     };
 }
 
-function createFullTable(tbody: HTMLTableSectionElement, json: Idata, dubl: boolean, fio: string): void;
-function createFullTable(tbody: HTMLTableSectionElement, json: Idata, dubl: HTMLTableSectionElement, fio: string, fac: string, usl: string, streamCode: string): Iperson;
-function createFullTable(tbody: HTMLTableSectionElement, json: Idata, dubl: HTMLTableSectionElement | boolean, fio: string, fac?: string, usl?: string, streamCode?: string) {
-    const toTbody = (arr: any[]) => tbody.appendChild(tableRow(arr));
+function createFullTable(tbody: HTMLTableSectionElement, json: IData, dubl: boolean, fio: string): void;
+function createFullTable(tbody: HTMLTableSectionElement, json: IData, dubl: HTMLTableSectionElement, fio: string, fac: string, usl: string, streamCode: string): IPerson;
+function createFullTable(tbody: HTMLTableSectionElement, json: IData, dubl: HTMLTableSectionElement | boolean, fio: string, fac?: string, usl?: string, streamCode?: string) {
+    const toTbody = (arr: string[]) => tbody.appendChild(tableRow(arr));
     if (dubl instanceof HTMLTableSectionElement) {
         if (json.hasOwnProperty(fio)) {
             const dubl_mess = `Дубликат: ${fio}\nПредыдущее вхождение: ${json[fio].stream}, ${json[fio].usl}\nТекущее вхождение: ${streamCode}, ${usl}`;
@@ -352,7 +358,7 @@ function createFullTable(tbody: HTMLTableSectionElement, json: Idata, dubl: HTML
             console.warn(dubl_mess);
             dubl.appendChild(tableRow([fio, 'G' + json[fio].stream, json[fio].usl, 'G' + streamCode, usl]));
         }
-        toTbody(['G' + streamCode, usl, fio, fac]);
+        toTbody(['G' + streamCode, usl!, fio, fac!]);
         return { fac: fac, usl: usl, stream: streamCode };
     } else {
         const { fac, usl, stream } = json[fio];
@@ -360,9 +366,9 @@ function createFullTable(tbody: HTMLTableSectionElement, json: Idata, dubl: HTML
     }
 }
 
-function postgraduate() {
+function postgraduate(): IResult {
     let stream: string = "", count = 0;
-    const json: IpostGradJson = {};
+    const json: IJsonPost = {};
     const trs = Array.from(document.querySelectorAll<TR>("body > div.main.page.table-page > section.static-page-rule > div > div > table > tbody > tr")).filter(tr => tr.style.backgroundColor === "");
     for (const i of trs) {
         const npr = i.querySelector("td.npr") as TD;
@@ -379,10 +385,8 @@ function postgraduate() {
         }
     }
     return {
-        akt_table: null,
         akt_json: json,
         count: count,
-        dubles: null
     };
 }
 
@@ -392,7 +396,7 @@ function isMaga(str: string) {
 }
 
 function getFacBak(str: string) {
-    let fac;
+    let fac: string;
     switch (str) {
         case '01.03.02':
         case '09.03.02':
@@ -458,7 +462,7 @@ function getFacBak(str: string) {
 }
 
 function getFacMaga(prog: string, stream: string) {
-    let fac;
+    let fac: string;
     switch (prog) {
         case "Математическое и компьютерное моделирование":
         case "Индустриальные киберфизические системы":
@@ -610,7 +614,7 @@ function readFile(input: HTMLInputElement) {
 }
 
 function addWindowNum() {
-    const wind = (document.querySelector("#P9_WINDOW")! as HTMLInputElement).value;
+    const wind = (document.querySelector("#P9_WINDOW") as HTMLInputElement).value;
     if (wind) {
         file_name = file_name.substring(0, 1) + wind + file_name.substring(1);
     }
@@ -642,7 +646,7 @@ function makeButton(name: string, span_class?: string) {
     return a;
 }
 
-function makeDlink(name: string, source: IJson | IpostGradJson | HTMLTableElement, form: string, rename = name) {
+function makeDlink(name: string, source: IJson | IJsonPost | HTMLTableElement, form: string, rename = name) {
     const xls = (source instanceof HTMLTableElement);
     const a = makeButton(`${rename}.${form}`, xls ? "fa-file-excel-o" : "fa-download");
     a.href = xls ? akt2xls(source, name) : akt2json(source);
@@ -651,16 +655,20 @@ function makeDlink(name: string, source: IJson | IpostGradJson | HTMLTableElemen
 }
 
 function akt2xls(table: HTMLTableElement, name: string) {
+    interface Ictx {
+        worksheet: string;
+        table: string;
+    }
     const uri = 'data:application/vnd.ms-excel;base64,',
         template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>',
-        ctx = { worksheet: name, table: table.innerHTML },
-        base64 = (s: string | number | boolean) => window.btoa(unescape(encodeURIComponent(s))),
-        format = (s: string, c: { [x: string]: any; worksheet?: any; table?: any; }) => s.replace(/{(\w+)}/g, (m: any, p: string | number) => c[p]);
+        ctx: Ictx = { worksheet: name, table: table.innerHTML },
+        base64 = (s: string) => window.btoa(unescape(encodeURIComponent(s))),
+        format = (s: string, c: Ictx) => s.replace(/{(\w+)}/g, (_, p: string) => c[p as keyof Ictx]);
 
     return uri + base64(format(template, ctx));
 }
 
-function akt2json(json_data: IJson | IpostGradJson) {
+function akt2json(json_data: IJson | IJsonPost) {
     return URL.createObjectURL(new Blob([JSON.stringify(json_data)], { type: 'application/json' }));
 }
 

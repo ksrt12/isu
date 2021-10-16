@@ -18,4 +18,12 @@ interface IJson {
     data: Idata;
 }
 
-export type { Imeta, Iperson, Idata, IJson };
+interface IpostGradJson {
+    [key: string]: {
+        [key: string]: number;
+    };
+}
+
+type IAllJson = Idata | IJson | IpostGradJson;
+
+export type { Imeta, Iperson, Idata, IJson, IpostGradJson, IAllJson };
