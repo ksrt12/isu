@@ -134,10 +134,10 @@ const MergePage: React.FC = () => {
             <NavLink to="/">На главную</NavLink>
         </div>
         <div id="main">
-            <label>
+            <div className="diff">
                 <input id="diff" type="checkbox" checked={diff} disabled={disDiff} onChange={changeDiff} />
                 Diff
-            </label>
+            </div>
             <input id="source" type="file" multiple accept="application/json" onChange={(event) => loadFiles(event)} />
             <div className="merge between">
                 <button id="merge" disabled={disMergeBtn} onClick={mergeJSONs}>{mergeName}</button>

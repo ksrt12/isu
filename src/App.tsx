@@ -1,7 +1,7 @@
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import MainPage from "./pages/MainPage";
 import MergePage from "./pages/MergePage";
-import "./app.css";
+import "./app.scss";
 
 const App: React.FC = () => {
     return (
