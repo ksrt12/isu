@@ -15,49 +15,46 @@ export { };
 // @grant       none
 // ==/UserScript==
 
-let rating: { five: number; four: number; three: number; };
-
-function Info(str: string) {
-    // @ts-ignore
-    G2.notify(str);
-}
+let rating: { [key: number]: number; };
 
 function makeSum(table: number, col: number) {
     let a = document.querySelectorAll("table").item(table).querySelectorAll("tbody > tr:not(.info)");
-    for (let i of a) {
-        let b = i.querySelector<HTMLTableElement>(`td:nth-child(${col})`)!.innerText;
+    for (const i of a) {
+        const b = i.querySelector<HTMLTableCellElement>(`td:nth-child(${col})`)!.innerText;
         if (b.includes('отлично')) {
-            rating.five++;
+            rating[5] += 1;
         } else if (b.includes('хорошо')) {
-            rating.four++;
+            rating[4] += 1;
         } else if (b.includes('удовлетворительно')) {
-            rating.three++;
+            rating[3] += 1;
         }
     }
 }
 
-function get_sum() {
+function updateSum() {
+    rating = { 5: 0, 4: 0, 3: 0 };
+    let sum = 0, c = 0, marks = "";
     makeSum(2, 3);
     makeSum(3, 2);
-    const sum = rating.five * 5 + rating.four * 4 + rating.three * 3;
-    const c = rating.five + rating.four + rating.three;
-    return 'Средний балл: ' + (sum / c).toFixed(4);
-}
-
-function updateSum() {
-    rating = { five: 0, four: 0, three: 0 };
-    const str = get_sum();
-    Info(str);
-    document.querySelector("#ias")!.textContent = `${str} (5: ${rating.five}, 4: ${rating.four}, 3: ${rating.three})`;
+    for (const [mark, count] of Object.entries(rating)) {
+        // @ts-ignore
+        sum += mark * count;
+        c += count;
+        marks += `${mark}: ${count}, `;
+    }
+    const str = (c === 0) ? "Оценок нет" : "Средний балл: " + (sum / c).toFixed(4);
+    // @ts-ignore
+    G2.notify(str);
+    document.querySelector("#ias")!.textContent = `${str} (${marks.slice(0, -2)})`;
 }
 
 window.addEventListener("load", () => {
-    let P = document.createElement('h4');
+    const P = document.createElement('h4');
     P.id = "ias";
     P.style.cursor = "pointer";
     P.onclick = () => updateSum();
 
-    let VKR = document.querySelector(".note.note-info");
+    const VKR = document.querySelector(".note.note-info");
     if (VKR && !document.querySelector("#ias")) {
         VKR.after(P);
         P.after(document.createElement('br'));
