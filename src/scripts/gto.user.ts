@@ -1,3 +1,4 @@
+export { };
 // ==UserScript==
 // @name        ГТО
 // @version     1.1
@@ -21,7 +22,7 @@ interface IParams {
 }
 
 function load_params() {
-    let params: IParams = decodeURIComponent(window.location.search.replace('?', '')).split('&').reduce((p, e) => {
+    let params = decodeURIComponent(window.location.search.replace('?', '')).split('&').reduce((p, e) => {
         const [key, val] = e.split('=');
         p[key] = val;
         return p;

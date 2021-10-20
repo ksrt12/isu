@@ -18,9 +18,9 @@ const MergePage: React.FC = () => {
     let allInfo = {} as Imeta;
 
     const loadFiles = (event: ChangeEvent<HTMLInputElement>) => {
-        const files = event.target.files!;
+        const files = event.target.files;
 
-        if (files.length) {
+        if (files) {
             try {
                 for (const file of files) {
                     Promise.resolve(readToText(file)).then(parseJSON);
