@@ -1,8 +1,8 @@
 "use strict";
 // ==UserScript==
 // @name        Средний балл (приложение к диплому)
-// @version     1.1
-// @date        2021-08-02
+// @version     1.2.2
+// @date        2021-10-20
 // @author      kazakovstepan
 // @namespace   ITMO University
 // @description Считает текущий средний балл по приложению
@@ -16,8 +16,7 @@
 // ==/UserScript==
 let rating;
 function makeSum(table, col) {
-    let a = document.querySelectorAll("table").item(table).querySelectorAll("tbody > tr:not(.info)");
-    for (const i of a) {
+    for (const i of document.querySelectorAll("table").item(table).querySelectorAll("tbody > tr:not(.info)")) {
         const b = i.querySelector(`td:nth-child(${col})`).innerText;
         if (b.includes('отлично')) {
             rating[5] += 1;
@@ -48,6 +47,7 @@ function updateSum() {
 }
 window.addEventListener("load", () => {
     const P = document.createElement('h4');
+    P.title = "Обновить";
     P.id = "ias";
     P.style.cursor = "pointer";
     P.onclick = () => updateSum();
