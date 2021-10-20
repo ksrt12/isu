@@ -15,5 +15,6 @@
         "module": "commonjs",
         "moduleResolution": "Node",
         "outDir": "../../build/scripts",
+        "newLine": "lf"
     }
 }
