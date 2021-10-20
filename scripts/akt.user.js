@@ -30,7 +30,7 @@ function Info(str) {
     G2.notify(str);
 }
 const abit = isSite("abit.itmo");
-const recomm = isSite('bachelor/rating');
+const recomm = isSite("bachelor/rating");
 let json_raw, file_name;
 let source, go, clear;
 window.addEventListener("load", () => {
@@ -42,6 +42,7 @@ window.addEventListener("load", () => {
         makeExportISU();
     }
 });
+/** Generate report on enrollment order pages or recommended (https://abit.itmo.ru/page/110/) */
 function makeExport(prikaz) {
     let name, result;
     if (recomm) {
@@ -71,6 +72,7 @@ function makeExport(prikaz) {
     div.appendChild(makeButton(`Итого: ${result.count} человек`));
     return div;
 }
+/** Generate report in ISU ABIT system (https://isu.ifmo.ru/pls/apex/f?p=2175:9) */
 function makeExportISU() {
     const div = document.createElement("div");
     div.id = "isuEXT";
@@ -87,6 +89,7 @@ function makeExportISU() {
     div.appendChild(go);
     document.querySelector("div.form-group").after(div);
 }
+/** Initialize report */
 function initReport() {
     const json = loadJSON();
     if (json) {
@@ -94,6 +97,7 @@ function initReport() {
         const length = document.querySelector("#report_list_length > label > select");
         const ND = document.querySelector("#report_list > thead > tr > th:nth-child(1)");
         const keys = Object.keys(json.data);
+        /** Forced change of ISU table by adding an empty row element */
         const manual = () => setTimeout(() => document.querySelector("#report_list > tbody").firstElementChild.after(document.createElement("tr")), 50);
         Info("JSON загружен!\nУникальных ключей: " + keys.length);
         console.group(file_name);
@@ -104,47 +108,48 @@ function initReport() {
         console.group("init table...");
         Promise.resolve()
             .then(() => {
-                const grad = json.info.grad;
-                if (input.value === grad) {
-                    manual();
-                }
-                else {
-                    input.value = grad;
-                    input.dispatchEvent(new Event('input'));
-                    Log("set input to " + grad);
-                }
-            })
+            const grad = json.info.grad;
+            if (input.value === grad) {
+                manual();
+            }
+            else {
+                input.value = grad;
+                input.dispatchEvent(new Event('input'));
+                Log("set input to " + grad);
+            }
+        })
             .then(waitTable)
             .then(() => {
-                if (ND.getAttribute("aria-sort") === "ascending") {
-                    manual();
-                }
-                else {
-                    ND.click();
-                    Log("sort");
-                }
-            })
+            if (ND.getAttribute("aria-sort") === "ascending") {
+                manual();
+            }
+            else {
+                ND.click();
+                Log("sort");
+            }
+        })
             .then(waitTable)
             .then(() => {
-                length.selectedIndex = 6;
-                length.dispatchEvent(new Event('change'));
-                Log("set 1000");
-            })
+            length.selectedIndex = 6;
+            length.dispatchEvent(new Event('change'));
+            Log("set 1000");
+        })
             .then(waitTable)
             .then(() => {
-                console.groupEnd();
-                console.timeLog("done");
-                console.group("creating report...");
-                createReport(makeBaseTable(), json, keys);
-            });
+            console.groupEnd();
+            console.timeLog("done");
+            console.group("creating report...");
+            createReport(makeBaseTable(), json, keys);
+        });
     }
 }
+/** Create ISU report */
 function createReport(old_table, json, keys) {
     const merged_table = addList(old_table, json.data, json.info);
     const next = document.querySelector("#report_list_next");
     if (isEnabled(next)) {
         Promise.resolve()
-            .then(() => next.click())
+            .then(next.click)
             .then(waitTable)
             .then(() => createReport(merged_table, json, keys));
     }
@@ -176,11 +181,11 @@ function createReport(old_table, json, keys) {
         enable(clear);
     }
 }
+/** Add new rows form ISU table to report table */
 function addList(delo_table, data, info) {
     let count = 0;
     const isu_tbt = document.querySelectorAll("#report_list > tbody > tr[role]");
     const tbody = delo_table.querySelector("tbody");
-    const small = info.small;
     for (const i of isu_tbt) {
         const fio_id = i.querySelector("td:nth-child(2)");
         const fio = fio_id.innerText;
@@ -213,10 +218,10 @@ function addList(delo_table, data, info) {
                 data[fio].fac,
                 fio // ФИО
             ];
-            if (!small) {
+            if (!info.small) {
                 toTable.push("01.09.2021", // Дата
-                    "50 л., ЭПК ст. 450", // срок хранения
-                    orig // Оригинал
+                "50 л., ЭПК ст. 450", // срок хранения
+                orig // Оригинал
                 );
             }
             tbody.appendChild(tableRow(toTable));
@@ -228,6 +233,7 @@ function addList(delo_table, data, info) {
     Log(`added from page ${page}: ${count}`);
     return delo_table;
 }
+/** Parse loaded file */
 function loadJSON() {
     let json_data;
     try {
@@ -239,6 +245,7 @@ function loadJSON() {
     }
     return json_data;
 }
+/** Crear function */
 function makeClear() {
     const first_page = document.querySelector("#report_list_first");
     document.querySelector("#isuEXT").remove();
@@ -247,15 +254,19 @@ function makeClear() {
     }
     makeExportISU();
 }
+/** Check if an element is enabled */
 function isEnabled(elem) {
     return !elem.classList.contains("disabled");
 }
+/** Enable an element */
 function enable(elem) {
     elem.classList.remove("disabled");
 }
+/** Disable an element */
 function disable(elem) {
     elem.classList.add("disabled");
 }
+/** Get person ID from ISU table */
 function getID(elem) {
     const a = document.createElement("a");
     const pid = elem.querySelector("span:nth-child(2)").getAttribute("pid");
@@ -263,6 +274,7 @@ function getID(elem) {
     a.text = pid;
     return a;
 }
+/** Generate report from current table in https://abit.itmo.ru pages */
 function makeAktTable(hdr, grad) {
     let count = 0;
     const akt_meta = { small: recomm, grad: grad };
@@ -300,7 +312,7 @@ function makeAktTable(hdr, grad) {
         akt_table: akt_table,
         akt_json: { info: akt_meta, data: akt_data },
         count: count,
-        dubles: (dubl.hasChildNodes()) ? dubl_table : null
+        dubles: (dubl.hasChildNodes()) ? dubl_table : undefined
     };
 }
 function createFullTable(tbody, json, dubl, fio, fac, usl, streamCode) {
@@ -320,6 +332,7 @@ function createFullTable(tbody, json, dubl, fio, fac, usl, streamCode) {
         toTbody(['G' + stream, usl, fio, fac]);
     }
 }
+/** Generate postgraduate report */
 function postgraduate() {
     let stream = "", count = 0;
     const json = {};
@@ -340,15 +353,15 @@ function postgraduate() {
         }
     }
     return {
-        akt_table: null,
         akt_json: json,
         count: count,
-        dubles: null
     };
 }
+/** Check current stream is master or bachelor */
 function isMaga(str) {
     return str.includes(".04.");
 }
+/** Get bachelor's faculty name by stream */
 function getFacBak(str) {
     let fac;
     switch (str) {
@@ -414,6 +427,7 @@ function getFacBak(str) {
     }
     return fac;
 }
+/** Get master's faculty name by programm and stream */
 function getFacMaga(prog, stream) {
     let fac;
     switch (prog) {
@@ -541,6 +555,7 @@ function getFacMaga(prog, stream) {
     }
     return fac;
 }
+/** Function awaiting table changes */
 function waitTable() {
     const isuTbody = document.querySelector("#report_list > tbody");
     return new Promise(resolve => {
@@ -555,6 +570,7 @@ function waitTable() {
         }).observe(isuTbody, { childList: true });
     });
 }
+/** Read file from input as text */
 function readFile(input) {
     const file = input.files[0];
     Promise.resolve(readToText(file)).then(result => {
@@ -563,18 +579,22 @@ function readFile(input) {
         file_name = file.name.replace(/.json/i, '');
     });
 }
+/** Add window number to search input */
 function addWindowNum() {
     const wind = document.querySelector("#P9_WINDOW").value;
     if (wind) {
         file_name = file_name.substring(0, 1) + wind + file_name.substring(1);
     }
 }
+/** Check current site page href */
 function isSite(str) {
     return document.location.href.includes(str);
 }
+/** Colorize console.log */
 function Log(str, color = "deepskyblue") {
     console.log("%c" + str, "color:" + color);
 }
+/** Make button function */
 function makeButton(name, span_class) {
     const a = document.createElement("a");
     a.type = "button";
@@ -592,6 +612,13 @@ function makeButton(name, span_class) {
     a.appendChild(makeText(name));
     return a;
 }
+/**
+ * Make download link button
+ * @param name A name of button
+ * @param source JSON data or HTML table
+ * @param form Form: json | xls
+ * @param rename Like name by defalt
+ */
 function makeDlink(name, source, form, rename = name) {
     const xls = (source instanceof HTMLTableElement);
     const a = makeButton(`${rename}.${form}`, xls ? "fa-file-excel-o" : "fa-download");
@@ -599,13 +626,16 @@ function makeDlink(name, source, form, rename = name) {
     a.download = `${name}.${form}`.replace(/ /g, '_');
     return a;
 }
+/** Create download url for HTML table */
 function akt2xls(table, name) {
-    const uri = 'data:application/vnd.ms-excel;base64,', template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>', ctx = { worksheet: name, table: table.innerHTML }, base64 = (s) => window.btoa(unescape(encodeURIComponent(s))), format = (s, c) => s.replace(/{(\w+)}/g, (m, p) => c[p]);
+    const uri = 'data:application/vnd.ms-excel;base64,', template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>', ctx = { worksheet: name, table: table.innerHTML }, base64 = (s) => window.btoa(unescape(encodeURIComponent(s))), format = (s, c) => s.replace(/{(\w+)}/g, (_, p) => c[p]);
     return uri + base64(format(template, ctx));
 }
+/** Create download url for JSON data */
 function akt2json(json_data) {
     return URL.createObjectURL(new Blob([JSON.stringify(json_data)], { type: 'application/json' }));
 }
+/** Add child nodes to HTML element */
 function addEntry(x, tgt) {
     if ((typeof x === 'string') || (typeof x === 'number')) {
         tgt.appendChild(makeText("" + x));
@@ -619,6 +649,7 @@ function addEntry(x, tgt) {
         tgt.appendChild(x);
     }
 }
+/** Create table row from input array */
 function tableRow(l) {
     const tr = document.createElement('tr');
     for (const i of l) {
@@ -628,9 +659,11 @@ function tableRow(l) {
     }
     return tr;
 }
+/** Create text node */
 function makeText(str) {
     return document.createTextNode(str);
 }
+/** Make base table template */
 function makeBaseTable() {
     const base_table = document.createElement('table');
     base_table.setAttribute('rules', 'all');
@@ -638,6 +671,7 @@ function makeBaseTable() {
     base_table.createTBody();
     return base_table;
 }
+/** Read file from input as text */
 async function readToText(file) {
     const tmpFR = new FileReader();
     return new Promise((resolve, reject) => {

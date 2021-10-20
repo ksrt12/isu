@@ -51,8 +51,7 @@ function makeSum(tbody) {
             }
         }
     }
-    for (const subj of Object.keys(json)) {
-        const curr_subj = json[subj];
+    for (const [subj, curr_subj] of Object.entries(json)) {
         if (curr_subj.count > 1) {
             json[subj].mark = Number((curr_subj.mark / curr_subj.count).toFixed(0));
             json[subj].count = 1;
@@ -98,13 +97,13 @@ function updateSum() {
     document.querySelector("#ias").textContent = `${str} (${marks.slice(0, -2)})`;
 }
 window.addEventListener("load", () => {
-    let P = document.createElement('h4');
+    const P = document.createElement('h4');
     P.title = "Обновить";
     P.id = "ias";
     P.style.cursor = "pointer";
     P.onclick = () => updateSum();
     table_num = document.querySelectorAll("div.table-responsive").length;
-    let VKR = document.querySelectorAll("h4").item(table_num);
+    const VKR = document.querySelectorAll("h4").item(table_num);
     if (VKR && (document.querySelector("#ias") === null)) {
         VKR.before(P);
         P.after(document.createElement('br'));

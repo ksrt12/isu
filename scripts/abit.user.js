@@ -48,7 +48,13 @@ const getElem = {
         return elem.options[elem.options.selectedIndex].text;
     }
 };
-// make buttons
+/**
+ * Make button
+ * @param str Button name
+ * @param ISUid ISU element ID
+ * @param func Callback
+ * @returns HTMLButtonElement
+ */
 function addCheckButton(str, ISUid, func) {
     const ISUELEM = getElem.id(ISUid);
     let finalID = "ButCheck";
@@ -74,22 +80,23 @@ function addCheckButton(str, ISUid, func) {
         CheckButton.onclick = func;
     }
 }
-// create full name
+/** Generate GET-link */
 function getFullName() {
     return `?LN=${getElem.val('ST_LASTNAME')}&FN=${getElem.val('ST_FIRSTNAME')}&MN=${getElem.val('ST_MIDDLENAME')}`;
 }
-// generate link for checking gto
+/** Generate link for checking all olymps on https://abit.snegiry.art */
 function addAllOlympsCheck() {
     return `https://abit.snegiry.art/${getFullName()}&BD=${getElem.val('ST_DOB').split('.').reverse().join('-')}&DN=${getElem.val('P2_DELO')}`;
 }
-// generate link for checking all olymps
+/** Generate link for checking GTO (https://www.gto.ru/sign/check) */
 function gtoCheck() {
     return `https://www.gto.ru/sign/check${getFullName()}&BD=${getElem.val('ST_DOB')}`;
 }
+/** Get olymp number */
 function getONUM() {
     return getElem.val('OLYMP_NUM').replace(/[. -]+/g, "");
 }
-// generate link for checking current olymp
+/** Generate link for checking current olymp */
 function addOlympCheck() {
     const OLYMPNUM = getONUM();
     const OLYMPYEAR = Number(getElem.val('OLYMP_YEAR'));
@@ -105,20 +112,20 @@ function addOlympCheck() {
         return `https://diploma.rsr-olymp.ru/files/rsosh-diplomas-static/compiled-storage-${OLYMPYEAR}/by-code/${OLYMPNUM}/white.pdf`;
     }
 }
-// set checkboxes automatically if 'LK_DELO_0' is checked
+/** Set checkboxes automatically if 'LK_DELO_0' is checked */
 function autoPhotoCopy(DZCH) {
     DZCH.onclick = () => {
         getElem.input('LK_PHOTO_0').checked = DZCH.checked;
         getElem.input('LK_PODL_COPY_0').checked = DZCH.checked;
     };
 }
-// add check button for current olymp
+/** Add check button for current olymp */
 function listenOLYMP() {
     if (getElem.id('ButCheck') === null && getElem.id('OLYMP_DELETE') !== null && getONUM() !== "") {
         addCheckButton("Печать", "OLYMP_DELETE", () => window.open(addOlympCheck(), '_blank'));
     }
 }
-// check BVI without agree
+/** Check BVI without agree */
 function checkBVIwoAgree() {
     const orig = getElem.input('LK_PODL_0').checked;
     const agree = getElem.text('LK_AGREE').substring(0, 8);
@@ -133,7 +140,7 @@ function checkBVIwoAgree() {
         }
     }
 }
-// get min points for current stream
+/** Get min points for current stream */
 function getMinPoints(stream) {
     let subj;
     const minpoints = {
@@ -178,7 +185,7 @@ function getMinPoints(stream) {
     }
     return minpoints;
 }
-// get subjects for VSOSH
+/** Get subjects for VSOSH */
 function getVSEROS(stream) {
     const languages = ["Немецкий язык", "Французкий язык", "Английский язык", "Итальянский язык", "Китайский язык"];
     const social = ["Экономика", "Обществознание", "Право"];
@@ -233,7 +240,7 @@ function getVSEROS(stream) {
     }
     return vsosh;
 }
-// get EGE points
+/** Get EGE points */
 function loadEGEpoints() {
     const EGE_points = {};
     for (const i of document.querySelectorAll("#report_baki_ege_rep > tbody > tr")) {
@@ -241,7 +248,10 @@ function loadEGEpoints() {
     }
     return EGE_points;
 }
-// get olymps
+/**
+ * Get olymps
+ * @returns List of olymps by names
+ */
 function loadOLYMPS() {
     const OLYMPSbyName = {};
     for (const i of document.querySelectorAll("#report_olymp_rep > tbody > tr > td:nth-child(1)")) {
@@ -250,7 +260,7 @@ function loadOLYMPS() {
     }
     return OLYMPSbyName;
 }
-// check current stream
+/** Check current stream */
 function checkSTREAM() {
     const EGE_points = loadEGEpoints(), OLYMPSbyName = loadOLYMPS(), annul_text = 'Аннулировано ' + getElem.id('APPL_ANN').textContent, curr_stream = getElem.text('APPL_PROG').substring(0, 8), curr_olymp = getElem.text('APPL_OLYMP'), appl_usl = getElem.index('APPL_USL'), isBVI = (appl_usl === 1), isOlymps = (getElem.id('report_olymp_rep') !== null);
     let points, mess = "", err_mes = false, err_count = 0, warn_count = 0, annul = (getElem.index('APPL_STATUS') === 1), minpoints = getMinPoints(curr_stream);
@@ -386,24 +396,26 @@ function checkSTREAM() {
         }
     } // ИМРИП
 }
-// listen application
+/** Listen application */
 function checkAPPL() {
     const HASH = document.location.hash;
     if (HASH === "#olymp") {
         new MutationObserver(() => listenOLYMP())
             .observe(document.querySelector("#st_form > div > div > div:nth-child(3) > div"), {
-                attributes: true,
-                attributeFilter: ["style"]
-            });
+            attributes: true,
+            attributeFilter: ["style"]
+        });
     }
     if (HASH === "#appl") {
         console.log("opened appl");
         document.querySelector("#appl_form > div.panel-body").onchange = addCheckButton("Проверить", "APPL_UPDATE", checkSTREAM);
     }
 }
+/** Helper sleep function */
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+/** Download all documents automatically */
 async function openAllDocs() {
     for (const i of getElem.id("report_R3997083729921636026").querySelectorAll("tbody > tr")) {
         const a = i.firstElementChild.firstElementChild;
@@ -412,8 +424,9 @@ async function openAllDocs() {
         await sleep(700);
     }
 }
+/** Set normal width of table columns */
 function setWidth() {
-    new MutationObserver((unused, observer) => {
+    new MutationObserver((_, observer) => {
         for (const i of ["sorting_kp", "sorting_date", "sorting_status"]) {
             document.querySelector("#report_docs > thead > tr > th." + i).style.width = "100px";
         }
@@ -442,11 +455,10 @@ function main() {
         }
     }
     else if (url.includes('ELECTRONIC_DOCUMENT') || url.includes('=2175:80:')) {
-        addCheckButton("Скачать всё", "report_R3997083729921636026", () => openAllDocs());
+        addCheckButton("Скачать всё", "report_R3997083729921636026", openAllDocs);
     }
     else if (url.includes('=2175:81:')) {
         setWidth();
     }
 }
 main();
-export { };
