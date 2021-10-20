@@ -16,17 +16,12 @@ export { };
 // @grant       none
 // ==/UserScript==
 
-// default Interface
-interface IParams {
-    [key: string]: string;
-}
-
 function load_params() {
     let params = decodeURIComponent(window.location.search.replace('?', '')).split('&').reduce((p, e) => {
         const [key, val] = e.split('=');
         p[key] = val;
         return p;
-    }, {} as IParams);
+    }, {} as { [key: string]: string; });
     params.NAME = `${params.LN} ${params.FN} ${params.MN}`;
     return params;
 }
