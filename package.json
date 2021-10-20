@@ -20,10 +20,10 @@
     "predeploy": "yarn build",
     "deploy": "gh-pages -d build -m \"$(git show -s --format='Update from %h: %s')\"",
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && yarn userscripts",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "userscripts": "tsc -p ./src/scripts/tsconfig.json"
+    "userscripts": "tsc -p ./src/scripts/tsconfig.json && sed '2d' -i ./build/scripts/*.user.js"
   },
   "eslintConfig": {
     "extends": [
