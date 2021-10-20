@@ -83,6 +83,7 @@ window.addEventListener("load", () => {
     }
 });
 
+/** Generate report on enrollment order pages or recommended (https://abit.itmo.ru/page/110/) */
 function makeExport(prikaz: string) {
     let name: string, result: IResult;
     if (recomm) {
@@ -110,6 +111,7 @@ function makeExport(prikaz: string) {
     return div;
 }
 
+/** Generate report in ISU ABIT system (https://isu.ifmo.ru/pls/apex/f?p=2175:9) */
 function makeExportISU() {
     const div = document.createElement("div");
     div.id = "isuEXT";
@@ -127,6 +129,7 @@ function makeExportISU() {
     document.querySelector("div.form-group")!.after(div);
 }
 
+/** Initialize report */
 function initReport() {
     const json = loadJSON();
     if (json) {
@@ -134,6 +137,7 @@ function initReport() {
         const length = document.querySelector("#report_list_length > label > select") as HTMLSelectElement;
         const ND = document.querySelector("#report_list > thead > tr > th:nth-child(1)") as TD;
         const keys = Object.keys(json.data);
+        /** Forced change of ISU table by adding an empty row element */
         const manual = () => setTimeout(() => document.querySelector("#report_list > tbody")!.firstElementChild!.after(document.createElement("tr")), 50);
         Info("JSON загружен!\nУникальных ключей: " + keys.length);
         console.group(file_name);
@@ -178,12 +182,13 @@ function initReport() {
     }
 }
 
+/** Create ISU report */
 function createReport(old_table: HTMLTableElement, json: IJson, keys: string[]) {
     const merged_table = addList(old_table, json.data, json.info);
     const next = document.querySelector("#report_list_next") as HTMLElement;
     if (isEnabled(next)) {
         Promise.resolve()
-            .then(() => next.click())
+            .then(next.click)
             .then(waitTable)
             .then(() => createReport(merged_table, json, keys));
     } else {
@@ -199,7 +204,7 @@ function createReport(old_table: HTMLTableElement, json: IJson, keys: string[]) 
         const mess = `Найдено ключей: ${new_keys.length} из ${keys.length}`;
         if (diff.length) {
             Warn(mess);
-            const notfound = { xls: makeBaseTable(), json: { info: json.info, data: {} as IData } };
+            const notfound = { xls: makeBaseTable(), json: { info: json.info, data: {} } as IJson };
             for (const i of diff) {
                 createFullTable(notfound.xls.tBodies[0], json.data, false, i);
                 notfound.json.data[i] = json.data[i];
@@ -214,6 +219,7 @@ function createReport(old_table: HTMLTableElement, json: IJson, keys: string[]) 
     }
 }
 
+/** Add new rows form ISU table to report table */
 function addList(delo_table: HTMLTableElement, data: IData, info: IMeta) {
     let count = 0;
     const isu_tbt = document.querySelectorAll<TR>("#report_list > tbody > tr[role]");
@@ -267,6 +273,7 @@ function addList(delo_table: HTMLTableElement, data: IData, info: IMeta) {
     return delo_table;
 }
 
+/** Parse loaded file */
 function loadJSON() {
     let json_data: IJson;
     try {
@@ -278,6 +285,7 @@ function loadJSON() {
     return json_data;
 }
 
+/** Crear function */
 function makeClear() {
     const first_page = document.querySelector("#report_list_first") as HTMLElement;
     document.querySelector("#isuEXT")!.remove();
@@ -287,18 +295,22 @@ function makeClear() {
     makeExportISU();
 }
 
+/** Check if an element is enabled */
 function isEnabled(elem: HTMLElement) {
     return !elem.classList.contains("disabled");
 }
 
+/** Enable an element */
 function enable(elem: HTMLElement) {
     elem.classList.remove("disabled");
 }
 
+/** Disable an element */
 function disable(elem: HTMLAnchorElement) {
     elem.classList.add("disabled");
 }
 
+/** Get person ID from ISU table */
 function getID(elem: HTMLElement) {
     const a = document.createElement("a");
     const pid = elem.querySelector("span:nth-child(2)")!.getAttribute("pid")!;
@@ -307,6 +319,7 @@ function getID(elem: HTMLElement) {
     return a;
 }
 
+/** Generate report from current table in https://abit.itmo.ru pages */
 function makeAktTable(hdr: number | string, grad: string): IResult {
     let count = 0;
     const akt_meta: IMeta = { small: recomm, grad: grad };
@@ -347,6 +360,13 @@ function makeAktTable(hdr: number | string, grad: string): IResult {
     };
 }
 
+/**
+ * Helper function to find duplicates and add new rows to report table
+ * @param tbody Body of report table
+ * @param json JSON data
+ * @param dubl Body of duplicates table | false
+ * @param fio Person name
+ */
 function createFullTable(tbody: HTMLTableSectionElement, json: IData, dubl: boolean, fio: string): void;
 function createFullTable(tbody: HTMLTableSectionElement, json: IData, dubl: HTMLTableSectionElement, fio: string, fac: string, usl: string, streamCode: string): IPerson;
 function createFullTable(tbody: HTMLTableSectionElement, json: IData, dubl: HTMLTableSectionElement | boolean, fio: string, fac?: string, usl?: string, streamCode?: string) {
@@ -366,6 +386,7 @@ function createFullTable(tbody: HTMLTableSectionElement, json: IData, dubl: HTML
     }
 }
 
+/** Generate postgraduate report */
 function postgraduate(): IResult {
     let stream: string = "", count = 0;
     const json: IJsonPost = {};
@@ -390,11 +411,12 @@ function postgraduate(): IResult {
     };
 }
 
-
+/** Check current stream is master or bachelor */
 function isMaga(str: string) {
     return str.includes(".04.");
 }
 
+/** Get bachelor's faculty name by stream */
 function getFacBak(str: string) {
     let fac: string;
     switch (str) {
@@ -461,6 +483,7 @@ function getFacBak(str: string) {
     return fac;
 }
 
+/** Get master's faculty name by programm and stream */
 function getFacMaga(prog: string, stream: string) {
     let fac: string;
     switch (prog) {
@@ -589,6 +612,7 @@ function getFacMaga(prog: string, stream: string) {
     return fac;
 }
 
+/** Function awaiting table changes */
 function waitTable() {
     const isuTbody = document.querySelector("#report_list > tbody") as HTMLTableSectionElement;
     return new Promise(resolve => {
@@ -604,6 +628,7 @@ function waitTable() {
     });
 }
 
+/** Read file from input as text */
 function readFile(input: HTMLInputElement) {
     const file = input.files![0];
     Promise.resolve(readToText(file)).then(result => {
@@ -613,6 +638,7 @@ function readFile(input: HTMLInputElement) {
     });
 }
 
+/** Add window number to search input */
 function addWindowNum() {
     const wind = (document.querySelector("#P9_WINDOW") as HTMLInputElement).value;
     if (wind) {
@@ -620,14 +646,17 @@ function addWindowNum() {
     }
 }
 
+/** Check current site page href */
 function isSite(str: string) {
     return document.location.href.includes(str);
 }
 
+/** Colorize console.log */
 function Log(str: string, color = "deepskyblue") {
     console.log("%c" + str, "color:" + color);
 }
 
+/** Make button function */
 function makeButton(name: string, span_class?: string) {
     const a = document.createElement("a");
     a.type = "button";
@@ -646,6 +675,13 @@ function makeButton(name: string, span_class?: string) {
     return a;
 }
 
+/**
+ * Make download link button
+ * @param name A name of button
+ * @param source JSON data or HTML table
+ * @param form Form: json | xls
+ * @param rename Like name by defalt
+ */
 function makeDlink(name: string, source: IJson | IJsonPost | HTMLTableElement, form: string, rename = name) {
     const xls = (source instanceof HTMLTableElement);
     const a = makeButton(`${rename}.${form}`, xls ? "fa-file-excel-o" : "fa-download");
@@ -654,6 +690,7 @@ function makeDlink(name: string, source: IJson | IJsonPost | HTMLTableElement, f
     return a;
 }
 
+/** Create download url for HTML table */
 function akt2xls(table: HTMLTableElement, name: string) {
     interface Ictx {
         worksheet: string;
@@ -663,15 +700,17 @@ function akt2xls(table: HTMLTableElement, name: string) {
         template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>',
         ctx: Ictx = { worksheet: name, table: table.innerHTML },
         base64 = (s: string) => window.btoa(unescape(encodeURIComponent(s))),
-        format = (s: string, c: Ictx) => s.replace(/{(\w+)}/g, (_, p: string) => c[p as keyof Ictx]);
+        format = (s: string, c: Ictx) => s.replace(/{(\w+)}/g, (_, p: keyof Ictx) => c[p]);
 
     return uri + base64(format(template, ctx));
 }
 
+/** Create download url for JSON data */
 function akt2json(json_data: IJson | IJsonPost) {
     return URL.createObjectURL(new Blob([JSON.stringify(json_data)], { type: 'application/json' }));
 }
 
+/** Add child nodes to HTML element */
 function addEntry(x: any, tgt: HTMLTableCellElement) {
     if ((typeof x === 'string') || (typeof x === 'number')) {
         tgt.appendChild(makeText("" + x));
@@ -684,6 +723,7 @@ function addEntry(x: any, tgt: HTMLTableCellElement) {
     }
 }
 
+/** Create table row from input array */
 function tableRow(l: any[]) {
     const tr = document.createElement('tr');
     for (const i of l) {
@@ -694,10 +734,12 @@ function tableRow(l: any[]) {
     return tr;
 }
 
+/** Create text node */
 function makeText(str: string) {
     return document.createTextNode(str);
 }
 
+/** Make base table template */
 function makeBaseTable() {
     const base_table = document.createElement('table');
     base_table.setAttribute('rules', 'all');
@@ -706,6 +748,7 @@ function makeBaseTable() {
     return base_table;
 }
 
+/** Read file from input as text */
 async function readToText(file: Blob): Promise<string> {
     const tmpFR = new FileReader();
     return new Promise((resolve, reject) => {

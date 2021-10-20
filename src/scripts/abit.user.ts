@@ -53,7 +53,13 @@ const getElem = {
     }
 };
 
-// make buttons
+/**
+ * Make button
+ * @param str Button name
+ * @param ISUid ISU element ID
+ * @param func Callback
+ * @returns HTMLButtonElement
+ */
 function addCheckButton(str: string, ISUid: string, func: any): any {
     const ISUELEM = getElem.id(ISUid);
     let finalID = "ButCheck";
@@ -80,26 +86,27 @@ function addCheckButton(str: string, ISUid: string, func: any): any {
     }
 }
 
-// create full name
+/** Generate GET-link */
 function getFullName() {
     return `?LN=${getElem.val('ST_LASTNAME')}&FN=${getElem.val('ST_FIRSTNAME')}&MN=${getElem.val('ST_MIDDLENAME')}`;
 }
 
-// generate link for checking gto
+/** Generate link for checking all olymps on https://abit.snegiry.art */
 function addAllOlympsCheck() {
     return `https://abit.snegiry.art/${getFullName()}&BD=${getElem.val('ST_DOB').split('.').reverse().join('-')}&DN=${getElem.val('P2_DELO')}`;
 }
 
-// generate link for checking all olymps
+/** Generate link for checking GTO (https://www.gto.ru/sign/check) */
 function gtoCheck() {
     return `https://www.gto.ru/sign/check${getFullName()}&BD=${getElem.val('ST_DOB')}`;
 }
 
+/** Get olymp number */
 function getONUM() {
     return getElem.val('OLYMP_NUM').replace(/[. -]+/g, "");
 }
 
-// generate link for checking current olymp
+/** Generate link for checking current olymp */
 function addOlympCheck() {
     const OLYMPNUM = getONUM();
     const OLYMPYEAR = Number(getElem.val('OLYMP_YEAR'));
@@ -114,7 +121,7 @@ function addOlympCheck() {
     }
 }
 
-// set checkboxes automatically if 'LK_DELO_0' is checked
+/** Set checkboxes automatically if 'LK_DELO_0' is checked */
 function autoPhotoCopy(DZCH: HTMLInputElement) {
     DZCH.onclick = () => {
         getElem.input('LK_PHOTO_0').checked = DZCH.checked;
@@ -122,14 +129,14 @@ function autoPhotoCopy(DZCH: HTMLInputElement) {
     };
 }
 
-// add check button for current olymp
+/** Add check button for current olymp */
 function listenOLYMP() {
     if (getElem.id('ButCheck') === null && getElem.id('OLYMP_DELETE') !== null && getONUM() !== "") {
         addCheckButton("Печать", "OLYMP_DELETE", () => window.open(addOlympCheck(), '_blank'));
     }
 }
 
-// check BVI without agree
+/** Check BVI without agree */
 function checkBVIwoAgree() {
     const orig = getElem.input('LK_PODL_0').checked;
     const agree = getElem.text('LK_AGREE').substring(0, 8);
@@ -145,7 +152,7 @@ function checkBVIwoAgree() {
     }
 }
 
-// get min points for current stream
+/** Get min points for current stream */
 function getMinPoints(stream: string) {
     let subj: string[];
     const minpoints: { [key: string]: number; } = {
@@ -191,7 +198,7 @@ function getMinPoints(stream: string) {
     return minpoints;
 }
 
-// get subjects for VSOSH
+/** Get subjects for VSOSH */
 function getVSEROS(stream: string) {
     const languages = ["Немецкий язык", "Французкий язык", "Английский язык", "Итальянский язык", "Китайский язык"];
     const social = ["Экономика", "Обществознание", "Право"];
@@ -247,7 +254,7 @@ function getVSEROS(stream: string) {
     return vsosh;
 }
 
-// get EGE points
+/** Get EGE points */
 function loadEGEpoints() {
     const EGE_points: { [key: string]: number | undefined; } = {};
     for (const i of document.querySelectorAll("#report_baki_ege_rep > tbody > tr")) {
@@ -255,8 +262,10 @@ function loadEGEpoints() {
     }
     return EGE_points;
 }
-
-// get olymps
+/**
+ * Get olymps
+ * @returns List of olymps by names
+ */
 function loadOLYMPS() {
     const OLYMPSbyName: { [key: string]: string; } = {};
     for (const i of document.querySelectorAll<HTMLTableElement>("#report_olymp_rep > tbody > tr > td:nth-child(1)")) {
@@ -266,7 +275,7 @@ function loadOLYMPS() {
     return OLYMPSbyName;
 }
 
-// check current stream
+/** Check current stream */
 function checkSTREAM() {
     const
         EGE_points = loadEGEpoints(),
@@ -403,7 +412,7 @@ function checkSTREAM() {
     } // ИМРИП
 }
 
-// listen application
+/** Listen application */
 function checkAPPL() {
     const HASH = document.location.hash;
     if (HASH === "#olymp") {
@@ -419,23 +428,26 @@ function checkAPPL() {
     }
 }
 
+/** Helper sleep function */
 function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/** Download all documents automatically */
 async function openAllDocs() {
     for (const i of getElem.id("report_R3997083729921636026").querySelectorAll("tbody > tr")) {
-        const a = <HTMLAnchorElement>i.firstElementChild!.firstElementChild;
+        const a = i.firstElementChild!.firstElementChild as HTMLAnchorElement;
         console.log(a.innerText);
         window.open(a.href, '_blank');
         await sleep(700);
     }
 }
 
+/** Set normal width of table columns */
 function setWidth() {
-    new MutationObserver((unused, observer) => {
+    new MutationObserver((_, observer) => {
         for (const i of ["sorting_kp", "sorting_date", "sorting_status"]) {
-            document.querySelector<HTMLElement>("#report_docs > thead > tr > th." + i)!.style.width = "100px";
+            document.querySelector<HTMLTableCellElement>("#report_docs > thead > tr > th." + i)!.style.width = "100px";
         }
         observer.disconnect();
     }).observe(document.querySelector("#report_docs > tbody")!, { childList: true });
@@ -460,7 +472,7 @@ function main() {
             autoPhotoCopy(DZCH);
         }
     } else if (url.includes('ELECTRONIC_DOCUMENT') || url.includes('=2175:80:')) {
-        addCheckButton("Скачать всё", "report_R3997083729921636026", () => openAllDocs());
+        addCheckButton("Скачать всё", "report_R3997083729921636026", openAllDocs);
     } else if (url.includes('=2175:81:')) {
         setWidth();
     }
