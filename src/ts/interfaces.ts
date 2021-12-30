@@ -24,6 +24,12 @@ interface IpostGradJson {
     };
 }
 
-type IAllJson = Idata | IJson | IpostGradJson;
+interface dd {
+    [key: string]: {
+        [key: string]: string;
+    };
+}
 
-export type { Imeta, Iperson, Idata, IJson, IpostGradJson, IAllJson };
+type IAllJson = Idata | IJson | IpostGradJson | dd;
+
+export type { Imeta, Iperson, Idata, IJson, IpostGradJson, dd, IAllJson };

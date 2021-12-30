@@ -1,4 +1,4 @@
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainPage from "./pages/MainPage";
 import MergePage from "./pages/MergePage";
 import "./app.scss";
@@ -7,10 +7,10 @@ const App: React.FC = () => {
     return (
         <>
             <BrowserRouter>
-                <Switch>
-                    <Route component={MainPage} path="/" exact />
-                    <Route component={MergePage} path="/json2xls" />
-                </Switch>
+                <Routes >
+                    <Route element={<MainPage />} path="/" />
+                    <Route element={<MergePage />} path="/json2xls" />
+                </Routes >
             </BrowserRouter>
 
             <div className="copyright">
