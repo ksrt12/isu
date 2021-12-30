@@ -7,7 +7,7 @@ export { };
 // @namespace   ITMO University
 // @description Let's do it
 // @homepage    https://vk.com/kazakovstepan
-// @icon        https://isu.ksrt12.ru/favicon.ico
+// @icon        https://www.gto.ru/bundles/gtofront/img/logo-h4.png
 // @updateURL   https://isu.ksrt12.ru/scripts/gto.user.js
 // @downloadURL https://isu.ksrt12.ru/scripts/gto.user.js
 // @include     https://www.gto.ru/sign/*LN*
