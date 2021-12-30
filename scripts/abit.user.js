@@ -1,8 +1,8 @@
 "use strict";
 // ==UserScript==
 // @name        Абитуриент
-// @version     7.6.2
-// @date        2021-09-05
+// @version     7.6.3
+// @date        2021-12-30
 // @author      kazakovstepan
 // @namespace   ITMO University
 // @description IT's MOre than the Система Абитуриент
@@ -148,9 +148,11 @@ function getMinPoints(stream) {
         'Русский язык': 60
     };
     switch (stream) {
+        case '12.03.01':
         case '12.03.02':
         case '12.03.05':
         case '13.03.01':
+        case '13.03.02':
             subj = ["Информатика", "Физика"];
             break;
         case '12.03.03':
@@ -162,9 +164,11 @@ function getMinPoints(stream) {
             subj = ['Биология'];
             break;
         case '18.03.01':
-        case '18.03.02':
         case '19.03.01':
             subj = ['Химия'];
+            break;
+        case '18.03.02':
+            subj = ['Биология', 'Химия'];
             break;
         case '27.03.05':
         case '45.03.04':
