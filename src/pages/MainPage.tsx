@@ -7,7 +7,7 @@ const MainPage: React.FC<MainPageProps> = () => {
         { label: "abit", name: "Система Абитуриент" },
         { label: "gto", name: "Проверка ГТО" },
         { label: "akt", name: "Акты" },
-        { label: "de", name: "Описи" },
+        { label: "desc", name: "Описи" },
         { label: "dip", name: "Средний балл (по приложению к диплому)" },
         { label: "ias", name: "Средний балл (по зачётной книжке)" }
     ];
