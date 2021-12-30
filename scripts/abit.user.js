@@ -7,7 +7,7 @@
 // @namespace   ITMO University
 // @description IT's MOre than the Система Абитуриент
 // @homepage    https://vk.com/kazakovstepan
-// @icon        https://isu.ksrt12.ru/favicon.ico
+// @icon        https://isu.ifmo.ru/pls/apex/wwv_flow_file_mgr.get_file?p_security_group_id=100000&p_fname=report.png
 // @updateURL   https://isu.ksrt12.ru/scripts/abit.user.js
 // @downloadURL https://isu.ksrt12.ru/scripts/abit.user.js
 // @include     https://isu.ifmo.ru/pls/apex/f?p=2175:*
@@ -84,9 +84,9 @@ function addCheckButton(str, ISUid, func) {
 function getFullName() {
     return `?LN=${getElem.val('ST_LASTNAME')}&FN=${getElem.val('ST_FIRSTNAME')}&MN=${getElem.val('ST_MIDDLENAME')}`;
 }
-/** Generate link for checking all olymps on https://abit.snegiry.art */
+/** Generate link for checking all olymps on https://abit.ksrt12.ru */
 function addAllOlympsCheck() {
-    return `https://abit.snegiry.art/${getFullName()}&BD=${getElem.val('ST_DOB').split('.').reverse().join('-')}&DN=${getElem.val('P2_DELO')}`;
+    return `https://abit.ksrt12.ru/${getFullName()}&BD=${getElem.val('ST_DOB').split('.').reverse().join('-')}&DN=${getElem.val('P2_DELO')}`;
 }
 /** Generate link for checking GTO (https://www.gto.ru/sign/check) */
 function gtoCheck() {
@@ -102,7 +102,7 @@ function addOlympCheck() {
     const OLYMPYEAR = Number(getElem.val('OLYMP_YEAR'));
     if (OLYMPNUM.startsWith('0000')) {
         if (OLYMPYEAR >= 2018) {
-            return `https://abit.snegiry.art/files/${OLYMPYEAR}.pdf`;
+            return `https://abit.ksrt12.ru/files/${OLYMPYEAR}.pdf`;
         }
         else {
             return 'https://www.google.ru/';
