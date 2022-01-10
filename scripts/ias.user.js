@@ -18,7 +18,8 @@ let rating, table_num;
 function makeSum(tbody) {
     let json = {};
     let col_name = 0, col_point = 0, col_sem = 100;
-    const curr_table = Array.from(tbody.querySelectorAll("tr:not(.header)")).filter(tr => tr.style.backgroundColor === "" && tr.childElementCount > 5);
+    const curr_table = Array.from(tbody.querySelectorAll("tr:not(.header)"))
+        .filter(tr => tr.style.backgroundColor === "" && tr.childElementCount > 5);
     head: for (const i of tbody.querySelectorAll("th")) {
         switch (i.innerText.toLowerCase()) {
             case "семестр":

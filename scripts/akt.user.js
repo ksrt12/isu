@@ -381,7 +381,6 @@ function getFacBak(str) {
             break;
         case "10.03.01":
         case "11.03.03":
-        case "23.03.03":
             fac = "ФБИТ";
             break;
         case "12.03.01":
@@ -402,6 +401,7 @@ function getFacBak(str) {
         case "18.03.02":
             fac = "Центр ХИ";
             break;
+        case "05.03.06": // 2022
         case "13.03.01":
         case "16.03.03":
             fac = "ФЭиЭТ";
@@ -410,7 +410,7 @@ function getFacBak(str) {
             fac = "ФНЭ";
             break;
         case "16.03.01":
-            fac = "ФизФак|ФНЭ";
+            fac = "ФизФак|ФФ"; // 2022
             break;
         case "18.03.01":
             fac = "НОЦ Инфохимии";

@@ -27,6 +27,7 @@ function Info(str) {
     // @ts-ignore
     G2.notify(str);
 }
+const abitURL = "https://ksrt12.ru/abit";
 const getElem = {
     id(id) {
         return document.getElementById(id);
@@ -84,9 +85,9 @@ function addCheckButton(str, ISUid, func) {
 function getFullName() {
     return `?LN=${getElem.val('ST_LASTNAME')}&FN=${getElem.val('ST_FIRSTNAME')}&MN=${getElem.val('ST_MIDDLENAME')}`;
 }
-/** Generate link for checking all olymps on https://abit.ksrt12.ru */
+/** Generate link for checking all olymps on ${abitURL} */
 function addAllOlympsCheck() {
-    return `https://abit.ksrt12.ru/${getFullName()}&BD=${getElem.val('ST_DOB').split('.').reverse().join('-')}&DN=${getElem.val('P2_DELO')}`;
+    return `${abitURL}/${getFullName()}&BD=${getElem.val('ST_DOB').split('.').reverse().join('-')}&DN=${getElem.val('P2_DELO')}`;
 }
 /** Generate link for checking GTO (https://www.gto.ru/sign/check) */
 function gtoCheck() {
@@ -102,7 +103,7 @@ function addOlympCheck() {
     const OLYMPYEAR = Number(getElem.val('OLYMP_YEAR'));
     if (OLYMPNUM.startsWith('0000')) {
         if (OLYMPYEAR >= 2018) {
-            return `https://abit.ksrt12.ru/files/${OLYMPYEAR}.pdf`;
+            return `${abitURL}/files/${OLYMPYEAR}.pdf`;
         }
         else {
             return 'https://www.google.ru/';
@@ -267,7 +268,7 @@ function loadOLYMPS() {
 /** Check current stream */
 function checkSTREAM() {
     const EGE_points = loadEGEpoints(), OLYMPSbyName = loadOLYMPS(), annul_text = 'Аннулировано ' + getElem.id('APPL_ANN').textContent, curr_stream = getElem.text('APPL_PROG').substring(0, 8), curr_olymp = getElem.text('APPL_OLYMP'), appl_usl = getElem.index('APPL_USL'), isBVI = (appl_usl === 1), isOlymps = (getElem.id('report_olymp_rep') !== null);
-    let points, mess = "", err_mes = false, err_count = 0, warn_count = 0, annul = (getElem.index('APPL_STATUS') === 1), minpoints = getMinPoints(curr_stream);
+    let points, mess = "", err_mes = false, err_count = 0, warn_count = 0, isAnnul = (getElem.index('APPL_STATUS') === 1), minpoints = getMinPoints(curr_stream);
     const CountErr = (str) => {
         Err(str);
         err_count++;
@@ -297,7 +298,7 @@ function checkSTREAM() {
             const minsubjects = () => Object.keys(minpoints);
             const checkAnnul = (err_mes) => {
                 if (err_mes) {
-                    if (annul) {
+                    if (isAnnul) {
                         Info(`${annul_text}:\n${err_mes}`);
                         err_count = 0;
                         warn_count++;
@@ -350,7 +351,7 @@ function checkSTREAM() {
             }
             mess = `ЕГЭ: ${sum}`;
             if (warn_count !== 0) {
-                annul = false;
+                isAnnul = false;
                 err_mes = true;
             }
         }
@@ -380,14 +381,14 @@ function checkSTREAM() {
                 }
                 else {
                     points = EGE_points[curr_subj];
-                    if (points < 75 || points === undefined) {
+                    if (points === undefined || points < 75) {
                         CountErr(`Олимпиада не подтверждена! (${curr_subj}: ${points})`);
                     }
                 }
             }
         }
         if (err_count === 0) {
-            if (annul) {
+            if (isAnnul) {
                 Err(annul_text);
                 Warn('И зря!');
             }
