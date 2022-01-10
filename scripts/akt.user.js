@@ -1,8 +1,8 @@
 "use strict";
 // ==UserScript==
 // @name        АКТЫ
-// @version     6.5.4
-// @date        2021-10-11
+// @version     6.5.5
+// @date        2022-01-10
 // @author      kazakovstepan
 // @namespace   ITMO University
 // @description Генерирует неотсорированный акт
@@ -563,7 +563,7 @@ function waitTable() {
             const tr = (first) ? isuTbody.firstElementChild : isuTbody.lastElementChild;
             return tr.firstElementChild.innerText.substring(3, 7);
         };
-        new MutationObserver((unused, observer) => {
+        new MutationObserver((_, observer) => {
             Log(`table ready: ${num(true)}-${num(false)}`, "grey");
             resolve(true);
             observer.disconnect();
@@ -628,8 +628,8 @@ function makeDlink(name, source, form, rename = name) {
 }
 /** Create download url for HTML table */
 function akt2xls(table, name) {
-    const uri = 'data:application/vnd.ms-excel;base64,', template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>', ctx = { worksheet: name, table: table.innerHTML }, base64 = (s) => window.btoa(unescape(encodeURIComponent(s))), format = (s, c) => s.replace(/{(\w+)}/g, (_, p) => c[p]);
-    return uri + base64(format(template, ctx));
+    const template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body><table>{table}</table></body></html>', ctx = { worksheet: name, table: table.innerHTML }, base64 = (s) => window.btoa(decodeURIComponent(encodeURIComponent(s))), format = (s, c) => s.replace(/{(\w+)}/g, (_, p) => c[p]);
+    return 'data:application/vnd.ms-excel;base64,' + base64(format(template, ctx));
 }
 /** Create download url for JSON data */
 function akt2json(json_data) {
