@@ -31,7 +31,8 @@ interface ISubjects {
 function makeSum(tbody: HTMLTableSectionElement) {
     let json = {} as ISubjects;
     let col_name = 0, col_point = 0, col_sem = 100;
-    const curr_table = Array.from(tbody.querySelectorAll<HTMLTableRowElement>("tr:not(.header)")).filter(tr => tr.style.backgroundColor === "" && tr.childElementCount > 5);
+    const curr_table = Array.from(tbody.querySelectorAll<HTMLTableRowElement>("tr:not(.header)"))
+        .filter(tr => tr.style.backgroundColor === "" && tr.childElementCount > 5);
 
     head: for (const i of tbody.querySelectorAll("th")) {
         switch (i.innerText.toLowerCase()) {
