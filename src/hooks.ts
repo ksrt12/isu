@@ -8,9 +8,10 @@ export interface Ibtn {
     url: string;
     disabled: boolean;
     setName: React.Dispatch<React.SetStateAction<string>>;
-    setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
     update: Function;
     remove: Function;
+    disable: Function;
+    enable: Function;
 }
 
 const useBtn = (id: string, btnName: string): Ibtn => {
@@ -26,22 +27,13 @@ const useBtn = (id: string, btnName: string): Ibtn => {
         setReady(true);
     }, []);
 
-
-    const remove = useCallback(() => {
-        setReady(false);
-    }, []);
+    const remove = useCallback(() => setReady(false), []);
+    const disable = useCallback(() => setDisabled(true), []);
+    const enable = useCallback(() => setDisabled(false), []);
 
     return {
-        id,
-        ready,
-        name,
-        fileName,
-        url,
-        disabled,
-        setName,
-        setDisabled,
-        update,
-        remove
+        id, ready, name, fileName, url, disabled,
+        setName, update, remove, disable, enable
     };
 };
 

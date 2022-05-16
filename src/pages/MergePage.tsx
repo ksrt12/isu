@@ -12,7 +12,7 @@ interface MakeBtnProps {
 const MakeBtn: React.FC<MakeBtnProps> = ({ btn, func }) => {
     return (
         <div className={`${btn.id} between`}>
-            <button id={btn.id} disabled={btn.disabled} onClick={() => func()}>{btn.name}</button>
+            <button id={btn.id} disabled={btn.disabled} onClick={func}>{btn.name}</button>
             {btn.ready && <a href={btn.url} download={btn.fileName}>{btn.fileName}</a>}
         </div>
     );
@@ -35,7 +35,7 @@ const MergePage: React.FC = () => {
                 for (const file of files) {
                     Promise.resolve(readToText(file)).then(parseJSON);
                 }
-                mergeBtn.setDisabled(false);
+                mergeBtn.enable();
             } catch (err) {
                 console.log(err);
             }
@@ -79,7 +79,6 @@ const MergePage: React.FC = () => {
             if (dublArr.length && !diff) {
                 alert("См консоль!");
             }
-
             setMergedData({ ...mergedData, ...newData });
         };
 
@@ -87,9 +86,9 @@ const MergePage: React.FC = () => {
         const url = akt2json(diff ? dublJson : { info: allInfo, data: mergedData });
         mergeBtn.update(`${diff ? "Diff" : "Merged"}.json`, url);
         if (!diff) {
-            convertBtn.setDisabled(false);
+            convertBtn.enable();
         }
-        mergeBtn.setDisabled(true);
+        mergeBtn.disable();
     }, [convertBtn, diff, filesList, mergeBtn, mergedData]);
 
     const json2xls = useCallback(() => {
@@ -102,29 +101,30 @@ const MergePage: React.FC = () => {
 
         const url = akt2xls(akt_table, name);
         convertBtn.update(name, url);
-        convertBtn.setDisabled(true);
+        convertBtn.disable();
     }, [convertBtn, mergedData]);
 
     const clearData = () => {
         setFilesList([]);
         setDiff(false);
-        mergeBtn.setDisabled(true);
-        convertBtn.setDisabled(true);
+        mergeBtn.disable();
+        convertBtn.disable();
         mergeBtn.setName("MERGE");
         partClearData();
         setMergedData({});
-
     };
+
     const partClearData = () => {
         mergeBtn.remove();
         convertBtn.remove();
     };
+
     const changeDiff = () => {
         mergeBtn.setName(diff ? "MERGE" : "DIFF");
         setDiff(!diff);
         partClearData();
-        mergeBtn.setDisabled(false);
-        convertBtn.setDisabled(true);
+        mergeBtn.enable();
+        convertBtn.disable();
     };
 
     return (<>
@@ -137,21 +137,9 @@ const MergePage: React.FC = () => {
                 <input id="diff" type="checkbox" checked={diff} disabled={disDiff} onChange={changeDiff} />
                 Diff
             </div>
-            <input id="source" type="file" multiple accept="application/json" onChange={event => loadFiles(event)} />
+            <input id="source" type="file" multiple accept="application/json" onChange={loadFiles} />
             <MakeBtn btn={mergeBtn} func={mergeJSONs} />
             <MakeBtn btn={convertBtn} func={json2xls} />
-            {/* <div className="merge between">
-                <button id="merge" disabled={disMergeBtn} onClick={mergeJSONs}>{mergeName}</button>
-
-                {mergeBtn.ready && <MakeLink name={mergeBtn.name} url={mergeBtn.url} />}
-
-            </div>
-            <div className="convert between">
-                <button id="convert" disabled={disConvertBtn} onClick={json2xls}>JSON2XLS</button>
-                {convertBtn.ready && <MakeLink name={convertBtn.name} url={convertBtn.url} />}
-
-            </div> */}
-
         </div>
     </>);
 };
