@@ -29,7 +29,7 @@ interface ISubjects {
 }
 
 function makeSum(tbody: HTMLTableSectionElement) {
-    let json = {} as ISubjects;
+    let json: ISubjects = {};
     let col_name = 0, col_point = 0, col_sem = 100;
     const curr_table = Array.from(tbody.querySelectorAll<HTMLTableRowElement>("tr:not(.header)"))
         .filter(tr => tr.style.backgroundColor === "" && tr.childElementCount > 5);
@@ -103,8 +103,7 @@ function updateSum() {
     }
     getDiploma();
     for (const [mark, count] of Object.entries(rating)) {
-        // @ts-ignore
-        sum += mark * count;
+        sum += Number(mark) * count;
         c += count;
         marks += `${mark}: ${count}, `;
     }

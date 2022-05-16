@@ -1,37 +1,45 @@
-import ReactDOM from "react-dom";
+import { ChangeEvent, useCallback, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { ChangeEvent, useState } from "react";
 import { Idata, IJson, Imeta } from "../ts/interfaces";
 import { akt2json, akt2xls, makeBaseTable, readToText, tableRow } from "../ts/utils";
-import MakeBtn from "../tsx/MakeBtn";
+import useBtn, { Ibtn } from "../hooks";
+
+interface MakeBtnProps {
+    btn: Ibtn;
+    func: () => void;
+}
+
+const MakeBtn: React.FC<MakeBtnProps> = ({ btn, func }) => {
+    return (
+        <div className={`${btn.id} between`}>
+            <button id={btn.id} disabled={btn.disabled} onClick={() => func()}>{btn.name}</button>
+            {btn.ready && <a href={btn.url} download={btn.fileName}>{btn.fileName}</a>}
+        </div>
+    );
+};
 
 const MergePage: React.FC = () => {
-    const [disMergeBtn, setDisMergeBtn] = useState(true);
-    const [disConvertBtn, setDisConvertBtn] = useState(true);
     const [disDiff, setDisDiff] = useState(true);
     const [diff, setDiff] = useState(false);
-    const [mergeName, setMergeName] = useState("MERGE");
     const [filesList, setFilesList] = useState([] as IJson[]);
+    const [mergedData, setMergedData] = useState({} as Idata);
 
-    let mergedData = {} as Idata;
-    let dublJson = {} as Idata;
-    let allInfo = {} as Imeta;
+    const convertBtn = useBtn("convert", "JSON2XLS");
+    const mergeBtn = useBtn("merge", "MERGE");
 
     const loadFiles = (event: ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
-
+        clearData();
         if (files) {
             try {
                 for (const file of files) {
                     Promise.resolve(readToText(file)).then(parseJSON);
                 }
-                setDisMergeBtn(false);
+                mergeBtn.setDisabled(false);
             } catch (err) {
                 console.log(err);
             }
             setDisDiff(!(files.length === 2));
-        } else {
-            clearData();
         }
     };
 
@@ -40,8 +48,10 @@ const MergePage: React.FC = () => {
         setFilesList(prev => [preresult, ...prev]);
     };
 
-    const mergeJSONs = () => {
+    const mergeJSONs = useCallback((/*filesList: IJson[]*/) => {
         let dubl: string = "";
+        let allInfo = {} as Imeta;
+        let dublJson = {} as Idata;
 
         for (const { data: newData, info: newInfo } of filesList) {
             const currInfo = allInfo;
@@ -70,22 +80,19 @@ const MergePage: React.FC = () => {
                 alert("См консоль!");
             }
 
-            mergedData = { ...newData, ...mergedData };
+            setMergedData({ ...mergedData, ...newData });
         };
 
         console.log("mergedData", mergedData);
         const url = akt2json(diff ? dublJson : { info: allInfo, data: mergedData });
-        ReactDOM.render(
-            <MakeBtn name={`${diff ? "Diff" : "Merged"}.json`} url={url} />,
-            document.getElementById("merged")
-        );
+        mergeBtn.update(`${diff ? "Diff" : "Merged"}.json`, url);
         if (!diff) {
-            setDisConvertBtn(false);
+            convertBtn.setDisabled(false);
         }
-        setDisMergeBtn(true);
-    };
+        mergeBtn.setDisabled(true);
+    }, [convertBtn, diff, filesList, mergeBtn, mergedData]);
 
-    const json2xls = () => {
+    const json2xls = useCallback(() => {
         const name = "Coverted.xls";
         const akt_table = makeBaseTable();
         const tbody = akt_table.querySelector("tbody")!;
@@ -94,39 +101,31 @@ const MergePage: React.FC = () => {
         }
 
         const url = akt2xls(akt_table, name);
-        ReactDOM.render(
-            <MakeBtn name={name} url={url} />,
-            document.getElementById("converted")
-        );
-
-        setDisConvertBtn(true);
-    };
+        convertBtn.update(name, url);
+        convertBtn.setDisabled(true);
+    }, [convertBtn, mergedData]);
 
     const clearData = () => {
         setFilesList([]);
         setDiff(false);
-        setDisMergeBtn(true);
-        setDisConvertBtn(true);
-        setMergeName("MERGE");
+        mergeBtn.setDisabled(true);
+        convertBtn.setDisabled(true);
+        mergeBtn.setName("MERGE");
         partClearData();
-        mergedData = {};
-        allInfo = {} as Imeta;
+        setMergedData({});
 
     };
     const partClearData = () => {
-        ReactDOM.unmountComponentAtNode(document.getElementById("merged") as HTMLElement);
-        ReactDOM.unmountComponentAtNode(document.getElementById("converted") as HTMLElement);
-        dublJson = {};
+        mergeBtn.remove();
+        convertBtn.remove();
     };
-
     const changeDiff = () => {
-        setMergeName(diff ? "MERGE" : "DIFF");
+        mergeBtn.setName(diff ? "MERGE" : "DIFF");
         setDiff(!diff);
         partClearData();
-        setDisMergeBtn(false);
-        setDisConvertBtn(true);
+        mergeBtn.setDisabled(false);
+        convertBtn.setDisabled(true);
     };
-
 
     return (<>
         <div className="license-text between">
@@ -138,15 +137,20 @@ const MergePage: React.FC = () => {
                 <input id="diff" type="checkbox" checked={diff} disabled={disDiff} onChange={changeDiff} />
                 Diff
             </div>
-            <input id="source" type="file" multiple accept="application/json" onChange={(event) => loadFiles(event)} />
-            <div className="merge between">
+            <input id="source" type="file" multiple accept="application/json" onChange={event => loadFiles(event)} />
+            <MakeBtn btn={mergeBtn} func={mergeJSONs} />
+            <MakeBtn btn={convertBtn} func={json2xls} />
+            {/* <div className="merge between">
                 <button id="merge" disabled={disMergeBtn} onClick={mergeJSONs}>{mergeName}</button>
-                <div id="merged"></div>
+
+                {mergeBtn.ready && <MakeLink name={mergeBtn.name} url={mergeBtn.url} />}
+
             </div>
             <div className="convert between">
                 <button id="convert" disabled={disConvertBtn} onClick={json2xls}>JSON2XLS</button>
-                <div id="converted"></div>
-            </div>
+                {convertBtn.ready && <MakeLink name={convertBtn.name} url={convertBtn.url} />}
+
+            </div> */}
 
         </div>
     </>);
