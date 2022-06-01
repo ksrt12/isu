@@ -2,7 +2,6 @@
 // ==UserScript==
 // @name        Средний балл (по зачётке)
 // @version     2.1
-// @date        2021-09-01
 // @author      kazakovstepan
 // @namespace   ITMO University
 // @description Считает текущий средний балл
@@ -87,8 +86,7 @@ function updateSum() {
     }
     getDiploma();
     for (const [mark, count] of Object.entries(rating)) {
-        // @ts-ignore
-        sum += mark * count;
+        sum += Number(mark) * count;
         c += count;
         marks += `${mark}: ${count}, `;
     }
