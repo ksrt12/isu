@@ -2,7 +2,6 @@ export { };
 // ==UserScript==
 // @name        Абитуриент
 // @version     7.6.3
-// @date        2021-12-30
 // @author      kazakovstepan
 // @namespace   ITMO University
 // @description IT's MOre than the Система Абитуриент

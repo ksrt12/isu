@@ -2,7 +2,6 @@ export { };
 // ==UserScript==
 // @name        Средний балл (приложение к диплому)
 // @version     1.2.2
-// @date        2021-10-20
 // @author      kazakovstepan
 // @namespace   ITMO University
 // @description Считает текущий средний балл по приложению

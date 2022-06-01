@@ -1,7 +1,6 @@
 export { };
 // ==UserScript==
 // @name         Описи
-// @date         2021-08-21
 // @version      2.1
 // @author       kazakovstepan
 // @namespace    ITMO University

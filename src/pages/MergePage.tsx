@@ -49,9 +49,10 @@ const MergePage: React.FC = () => {
     };
 
     const mergeJSONs = useCallback((/*filesList: IJson[]*/) => {
-        let dubl: string = "";
+        let dubl = "";
         let allInfo = {} as Imeta;
-        let dublJson = {} as Idata;
+        let dublJson: Idata = {};
+        let mergedData: Idata = {};
 
         for (const { data: newData, info: newInfo } of filesList) {
             const currInfo = allInfo;
@@ -79,7 +80,7 @@ const MergePage: React.FC = () => {
             if (dublArr.length && !diff) {
                 alert("См консоль!");
             }
-            setMergedData({ ...mergedData, ...newData });
+            mergedData = { ...mergedData, ...newData };
         };
 
         console.log("mergedData", mergedData);
@@ -89,7 +90,8 @@ const MergePage: React.FC = () => {
             convertBtn.enable();
         }
         mergeBtn.disable();
-    }, [convertBtn, diff, filesList, mergeBtn, mergedData]);
+        setMergedData(mergedData);
+    }, [convertBtn, diff, filesList, mergeBtn]);
 
     const json2xls = useCallback(() => {
         const name = "Coverted.xls";
@@ -145,3 +147,4 @@ const MergePage: React.FC = () => {
 };
 
 export default MergePage;
+export { MakeBtn };

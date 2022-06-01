@@ -2,7 +2,6 @@ export { };
 // ==UserScript==
 // @name        ГТО
 // @version     1.1
-// @date        2021-09-01
 // @author      kazakovstepan
 // @namespace   ITMO University
 // @description Let's do it

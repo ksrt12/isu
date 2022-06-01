@@ -2,7 +2,6 @@ export { };
 // ==UserScript==
 // @name        АКТЫ
 // @version     6.5.5
-// @date        2022-01-10
 // @author      kazakovstepan
 // @namespace   ITMO University
 // @description Генерирует неотсорированный акт

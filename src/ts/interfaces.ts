@@ -1,35 +1,37 @@
-interface Imeta {
+export interface simpleJSON {
+    [key: string]: string;
+}
+
+export interface Imeta {
     small: boolean,
     grad: string;
 }
 
-interface Iperson {
+export interface Iperson {
     fac: string,
     usl: string;
     stream: string,
 }
 
-interface Idata {
+export interface Idata {
     [key: string]: Iperson;
 }
 
-interface IJson {
+export interface IJson {
     info: Imeta;
     data: Idata;
 }
 
-interface IpostGradJson {
+export interface IpostGradJson {
     [key: string]: {
         [key: string]: number;
     };
 }
 
-interface dd {
+export interface dd {
     [key: string]: {
         [key: string]: string;
     };
 }
 
-type IAllJson = Idata | IJson | IpostGradJson | dd;
-
-export type { Imeta, Iperson, Idata, IJson, IpostGradJson, dd, IAllJson };
+export type IAllJson = Idata | IJson | IpostGradJson | dd | simpleJSON;
