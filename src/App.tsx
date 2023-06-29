@@ -14,7 +14,7 @@ const App: React.FC = () => {
             </BrowserRouter>
 
             <div className="copyright">
-                <a target="_blank" rel="noreferrer" href="https://vk.com/kazakovstepan">&copy; 2020-2022, kazakovstepan</a>
+                <a target="_blank" rel="noreferrer" href="https://vk.com/kazakovstepan">&copy; 2020-2023, kazakovstepan</a>
             </div>
         </>
     );
